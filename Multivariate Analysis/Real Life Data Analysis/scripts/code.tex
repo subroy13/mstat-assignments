@@ -1,0 +1,625 @@
+\documentclass[10pt]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{float}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Multivariate Analysis},
+            pdfauthor={Subhrajyoty Roy (MB-1911)},
+            pdfborder={0 0 0},
+            breaklinks=true}
+
+\urlstyle{same}  % don't use monospace font for urls
+
+
+\usepackage{color}
+\usepackage{fancyvrb}
+
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Multivariate Analysis}
+    \pretitle{\vspace{\droptitle}\centering\huge\textbf}
+  \posttitle{\par}
+    \author{Subhrajyoty Roy (MB-1911)}
+    \preauthor{\centering\large}
+  \postauthor{\par}
+      \predate{\centering\large}
+  \postdate{\par}
+    \date{\today}
+
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+The National Basketball Association (NBA) is a men's professional
+basketball league in North America, composed of 30 teams (29 in the
+United States and 1 in Canada). It is one of the four major professional
+sports leagues in the United States and Canada, and is widely considered
+to be the premier men's professional basketball league in the world. It
+is of utmost importance for the team managers to scout promising players
+from college and also figure out whether a player will be in a
+basketball career long enough (at least 5 years) to create specific
+contracts with the player for the team.
+
+This project aims to find a simple statistical basis of classifying
+whether a rookie NBA player has \texttt{5\ year\ carrer\ longeveity}
+i.e.~whether a rookie NBA player will remain a popular and professional
+basketball player based on the predictors / features of his playing
+statistics and skills in college level.
+
+\section{The Dataset}\label{the-dataset}
+
+The dataset was obtain from the website \textbf{data.world}.
+
+The dataset comprises of the information of \(1340\) NBA rookie players,
+with information on \(20\) variables as predictors and one binary
+response, which takes value \(1\) if that player has a career length of
+at least 5 years and \(0\) otherwise. The \(20\) features / predictors
+are as follows:
+
+\begin{enumerate}
+\setlength\itemsep{-5pt}
+\item Name.
+\item Games played.
+\item
+  Minutes played.
+\item
+  Points per game.
+\item
+  Fields goal made per game.
+\item
+  Fields goal attempted per game.
+\item
+  Fields goal success rate = 100 \(\times\) Fields goal made / Fields
+  goal attempted.
+\item
+  3 Pointer made per game.
+\item
+  3 pointer attempted per game.
+\item
+  3 pointer success rate = 100 \(\times\) 3 pointer made / 3 pointer
+  attempted.
+\item
+  Free throw made per game.
+\item
+  Free throw attempted per game.
+\item
+  Free throw success rate = 100 \(\times\) Free throw made / Free throw
+  attempted.
+\item
+  Offensive rebound per game.
+\item
+  Defensive rebound per game.
+\item
+  Total rebound per game = (Offensive rebound + Defensive rebound) /
+  Total games played.
+\item
+  Assist per game.
+\item
+  Steals per game.
+\item
+  Blocks per game.
+\item
+  Turnovers per game.
+\end{enumerate}
+
+It is clear that the \texttt{Name} column should not be an useful
+predictor of the response variable \texttt{TARGET\_5Yrs}. Therefore, we
+remove the \texttt{Name} variable from the dataset. \par 
+
+It was also found that the \texttt{3P\%} contains some \texttt{NA} values. The reason for this is possibly because of the indeterminate \(0/0\) form, when the player has not made an attempt of 3 pointer ever, since professional players usually never try to attempt a shooting from 3 Pointer range because of its difficulty, unless they are absolutely confident. Hence, for those values, we set \texttt{3P\%} to \(0\) by default.
+
+
+
+\section{Descriptive Statistics}
+
+\subsection{Correlation Analysis}
+
+Before proceeding with a formal analysis of the dataset, it is good practice to perform some exploratory analysis of the data. Firstly, we consider the correlation structure of the variables present in the data to see whether multicollinearity is present. It is found that there are clusters of variables which are very much correlated to each other (Figure \ref{fig:corrplot}). Therefore, this indicates that the data might lie in a very low dimensional vector space within \(\mathbb{R}^{19}\), therefore, use of Principal Component Analysis (PCA) might help to visualize the clusters and help us predict the target response.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.8\linewidth]{code_files/figure-latex/unnamed-chunk-5-1.pdf}
+		\caption{Correlation Plot of the Variables in the dataset}
+		\label{fig:corrplot}
+	\end{center}
+\end{figure}
+
+
+
+\subsection{Principal Component Analysis}
+
+
+
+\begin{figure}[H]
+\begin{minipage}{0.5\linewidth}
+	To perform the principal component analysis, we use all the \(19\) variable together, since all of them are numerical in nature. The screeplot helps us to understand how much effective PCA is for this particular dataset. We see that almost 90\% of the variability is accounted by only 3 principal components, and first 4 principal components together accounts for 95\% of the variability (Figure \ref{fig:screeplot}). However, only 2 principal components at a time fail to capture the true clusters. Bur, the plot for PC1 vs PC3 seems to be the best
+	among above, in terms of splitting the two clusters (Figure \ref{fig:pairsplot}).	
+\end{minipage}
+\begin{minipage}{0.5\linewidth}
+		\begin{center}
+			\includegraphics[width=0.9\linewidth]{code_files/figure-latex/unnamed-chunk-7-1.pdf}
+			\caption{Screeplot of Principal Components}	
+			\label{fig:screeplot}
+		\end{center}
+	
+\end{minipage}
+\end{figure}
+
+
+\begin{figure}[H]
+	\includegraphics{code_files/figure-latex/unnamed-chunk-8-1.pdf}
+	\caption{Pairs plot of Principal Components indicated by True labels}
+	\label{fig:pairsplot}
+\end{figure}
+
+
+\subsection{Creation of Training and Testing Set}
+
+Now, we shall use some simple classification tehcniques (described in class) which would help us in achieving the goal to predict the \texttt{5\ year\ carrer\ longeveity} of NBA players. For this reason, to compare performances of various classification techniques, we randomly divide the whole dataset into two parts, one containing 75\% of all the observation, which is used to train the classification algorithms called \texttt{Training\ Set} and the rest 25\% will be used to measure the performance of those trained classification learners, called \texttt{Testing\ Set}. Note that both the training set and testing set contains similar proportion of target response variable.
+
+\begin{center}
+	\begin{tabular}{|c|c|c|c|}
+		\hline 
+		Set & Number of Target = $0$ & Number of Target = $1$ & Total\\
+		\hline 
+		Training Set & 370 & 635 & 1005\\
+		Testing Set & 139 & 196 & 335\\
+		\hline 
+	\end{tabular}
+\end{center}
+
+\section{Predictive Analysis}
+\subsection{Discriminant Analysis}
+\subsubsection{Linear Discriminant Analysis (LDA)}
+
+In this section, we use a linear discriminant analysis to predict the target variable. The inherent assumption of LDA model is that the datapoints under both class are distributed according to a multivariate normal distribution, with same covariance matrix, but with different means. Based on this, the naive Bayes classifier (MAP estimation) would give the form of a linear separating hyperplane. It was found that the contribution of most of the variables to form the separating hyperplane was very less. While Three Pointers made, Free Throw made, Offensive Rebounds, Block etc. has a positive impact, the variables like Three Pointers attempted, Turnovers etc. has a negative coefficient to form the decision boundary. 
+
+Next, the prediction for the response variable of each player is made, and the accuracy is obtained as the total number of correct predictions divided by the total number of predictions made. Clearly, as there is no class imbalance problem, the accuracy is not heavily affected, and is a good measure for comparison of different techniques. On the training set, the accuracy is found to be 73.9\%, while on the testing set the accuracy is found to be 67.4\%. 
+
+ 
+
+\subsubsection{Quadratic Discriminant Analysis}
+Similar to LDA, we also consider using QDA as a potential classifier. It theoretically improves upon the situation of LDA by allowing different groups / levels of response to have different covariance matrices. Therefore, rather than obtaining a linear classifier, QDA produces a
+quadratic decision boundary. However, the training set accuracy drops to 71\% and the testing set accuracy drops to 65\%. Therefore, it suggests that that the assumption that both the classes may have different covariance matrix is not quite valid. It also provides an indication why principal components fail to detect the classifiers, since the variance structure is same for both the levels of response variable.
+
+\subsection{Classification Tree}
+
+Now, we use a classification tree to predict \texttt{5\ year\ career\ longeiveity}, the response variable. We use Gini index as a measure of disparity. The resulting tree turns out to be quite small, with 7 leaf nodes, and according to it, the most important variables turn out to be Number of Games played, Offensive Rebounds, Fields Gold Made and Three Pointer Success percentage (Figure \ref{fig:class-tree}). Evaluating its performance, we see about 72\% accuracy in training set, and about 66\% accuracy in testing set.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=0.7\linewidth]{code_files/figure-latex/unnamed-chunk-19-1.pdf}
+		\caption{Trained Classification Tree to predict the response}
+		\label{fig:class-tree}
+	\end{center}
+\end{figure}
+
+\subsection{Support Vector Machine (SVM)}
+
+Finally, we use a Support Vector Machine (SVM) to perform the binary classification of the response variable. Support Vector Machine basically maps the feature space (i.e. the column space of covariates) to a higher dimensional space by computing various nonlinear functions through computation of kernel functions (or generalized dot products), and then obtaining a linear separating hyperplane through that higher dimensional feature space. 
+
+The best SVM Classifier was obtained with a radial (or gaussian) kernel function, which obtained 75\% accuracy in training set and about 72.8\% accuracy in testing set. SVM with linear, polynomial or sigmoid kernel gives a result of lesser accuracy. 
+
+\section{Conclusion}
+
+From the correlation analysis, it seems evident that some of the variables are very much correlated. However, a principal component analysis fails to separate the two classes because their variance structure is pretty much similar. It is also suggested by the result of Linear Discriminant Analysis. 
+
+However, Quadratic Discriminant Analysis, Classification Tree could not improve upon the prediction power of LDA. However, Support Vector Machine (SVM) does slightly better on both training and testing set. Also, SVM with sigmoid kernel is essentially similar to that of simple logistic regression, hence its accuracy being low would suggest that logistic regression would also not give a very good classifier in this context. 
+
+Therefore, in terms of interpretability and simplification of classification models, LDA would be a reasonable classifier for this data. However, in terms of performance metric of accuracy, SVM seems much better. But, a mere 72\% accuracy for predicting the career longeiveity is not so good. It may be possible that there are some other factors (like number of fans, popularity measures etc.) which actually controls the target response, the variables in the dataset may not be adequate enough to explain whether a basketball player will pursue long career in NBA. However, the above study provides insights to which variables are important for such predictions.
+
+\section{Appendix}
+
+\subsection{Code}
+
+The necessary codes and corresponding outputs to reproduce the analysis is shown here.
+
+\begin{Shaded}
+
+	\begin{Highlighting}[]
+\CommentTok{# read the data into R}
+\KeywordTok{library}\NormalTok{(readr)}
+\NormalTok{nbadata <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{'./nba_logreg.csv'}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(nbadata)}
+\NormalTok{nbadata <-}\StringTok{ }\NormalTok{nbadata[, }\DecValTok{-1}\NormalTok{]  }\CommentTok{# remove name column}
+\NormalTok{nbadata}\OperatorTok{$}\NormalTok{TARGET_5Yrs <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(nbadata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)  }\CommentTok{# convert to factor variable}
+\KeywordTok{dim}\NormalTok{(nbadata)  }\CommentTok{# dataset contains 1340 observations}
+\KeywordTok{summary}\NormalTok{(nbadata)}
+	\end{Highlighting}
+\end{Shaded}
+
+
+\begin{verbatim}
+# A tibble: 6 x 21
+Name     GP   MIN   PTS   FGM   FGA `FG%` `3P Made` `3PA` `3P%`   FTM
+<chr> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl>
+1 Bran~    36  27.4   7.4   2.6   7.6  34.7       0.5   2.1  25     1.6
+2 Andr~    35  26.9   7.2   2     6.7  29.6       0.7   2.8  23.5   2.6
+3 JaKa~    74  15.3   5.2   2     4.7  42.2       0.4   1.7  24.4   0.9
+4 Mali~    58  11.6   5.7   2.3   5.5  42.6       0.1   0.5  22.6   0.9
+5 Matt~    48  11.5   4.5   1.6   3    52.4       0     0.1   0     1.3
+6 Tony~    75  11.4   3.7   1.5   3.5  42.3       0.3   1.1  32.5   0.4
+# ... with 10 more variables: FTA <dbl>, `FT%` <dbl>, OREB <dbl>,
+#   DREB <dbl>, REB <dbl>, AST <dbl>, STL <dbl>, BLK <dbl>, TOV <dbl>,
+#   TARGET_5Yrs <dbl>
+\end{verbatim}
+
+\begin{verbatim}
+GP             MIN             PTS              FGM        
+Min.   :11.00   Min.   : 3.10   Min.   : 0.700   Min.   : 0.300  
+1st Qu.:47.00   1st Qu.:10.88   1st Qu.: 3.700   1st Qu.: 1.400  
+Median :63.00   Median :16.10   Median : 5.550   Median : 2.100  
+Mean   :60.41   Mean   :17.62   Mean   : 6.801   Mean   : 2.629  
+3rd Qu.:77.00   3rd Qu.:22.90   3rd Qu.: 8.800   3rd Qu.: 3.400  
+Max.   :82.00   Max.   :40.90   Max.   :28.200   Max.   :10.200  
+
+FGA              FG%           3P Made            3PA        
+Min.   : 0.800   Min.   :23.80   Min.   :0.0000   Min.   :0.0000  
+1st Qu.: 3.300   1st Qu.:40.20   1st Qu.:0.0000   1st Qu.:0.0000  
+Median : 4.800   Median :44.10   Median :0.1000   Median :0.3000  
+Mean   : 5.885   Mean   :44.17   Mean   :0.2476   Mean   :0.7792  
+3rd Qu.: 7.500   3rd Qu.:47.90   3rd Qu.:0.4000   3rd Qu.:1.2000  
+Max.   :19.800   Max.   :73.70   Max.   :2.3000   Max.   :6.5000  
+
+3P%              FTM             FTA              FT%        
+Min.   :  0.00   Min.   :0.000   Min.   : 0.000   Min.   :  0.00  
+1st Qu.:  0.00   1st Qu.:0.600   1st Qu.: 0.900   1st Qu.: 64.70  
+Median : 22.40   Median :1.000   Median : 1.500   Median : 71.25  
+Mean   : 19.31   Mean   :1.298   Mean   : 1.822   Mean   : 70.30  
+3rd Qu.: 32.50   3rd Qu.:1.600   3rd Qu.: 2.300   3rd Qu.: 77.60  
+Max.   :100.00   Max.   :7.700   Max.   :10.200   Max.   :100.00  
+NA's   :11                                                        
+OREB            DREB            REB              AST        
+Min.   :0.000   Min.   :0.200   Min.   : 0.300   Min.   : 0.000  
+1st Qu.:0.400   1st Qu.:1.000   1st Qu.: 1.500   1st Qu.: 0.600  
+Median :0.800   Median :1.700   Median : 2.500   Median : 1.100  
+Mean   :1.009   Mean   :2.026   Mean   : 3.034   Mean   : 1.551  
+3rd Qu.:1.400   3rd Qu.:2.600   3rd Qu.: 4.000   3rd Qu.: 2.000  
+Max.   :5.300   Max.   :9.600   Max.   :13.900   Max.   :10.600  
+
+STL              BLK              TOV        TARGET_5Yrs
+Min.   :0.0000   Min.   :0.0000   Min.   :0.100   0:509      
+1st Qu.:0.3000   1st Qu.:0.1000   1st Qu.:0.700   1:831      
+Median :0.5000   Median :0.2000   Median :1.000              
+Mean   :0.6185   Mean   :0.3686   Mean   :1.194              
+3rd Qu.:0.8000   3rd Qu.:0.5000   3rd Qu.:1.500              
+Max.   :2.5000   Max.   :3.9000   Max.   :4.400              
+
+\end{verbatim}
+
+
+\begin{Shaded}
+	\begin{Highlighting}[]
+\NormalTok{nbadata}\OperatorTok{$}\StringTok{`}\DataTypeTok{3P%}\StringTok{`}\NormalTok{[}\KeywordTok{is.na}\NormalTok{(nbadata}\OperatorTok{$}\StringTok{`}\DataTypeTok{3P%}\StringTok{`}\NormalTok{)] <-}\StringTok{ }\DecValTok{0}
+\KeywordTok{colnames}\NormalTok{(nbadata) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"GamePlay"}\NormalTok{,}\StringTok{"MinPlay"}\NormalTok{,}\StringTok{"Points"}\NormalTok{,}\StringTok{"FGMade"}\NormalTok{,}\StringTok{"FGAttempt"}\NormalTok{, }\StringTok{"FGSuccess"}\NormalTok{,}
+\StringTok{"TPMade"}\NormalTok{,}\StringTok{"TPAttempt"}\NormalTok{,}\StringTok{"TPSuccess"}\NormalTok{,}\StringTok{"FTMade"}\NormalTok{,}\StringTok{"FTAttempt"}\NormalTok{,}\StringTok{"FTSuccess"}\NormalTok{,}
+\StringTok{"OffRebound"}\NormalTok{,}\StringTok{"DefRebound"}\NormalTok{,}\StringTok{"TotalRebound"}\NormalTok{,}\StringTok{"Assist"}\NormalTok{,}\StringTok{"Steal"}\NormalTok{,}\StringTok{"Block"}\NormalTok{,}\StringTok{"Turnover"}\NormalTok{,}
+\StringTok{"TARGET_5Yrs"}\NormalTok{)}	\CommentTok{# changing column names for easier interpretation}
+
+\CommentTok{# computing the correlation plot}
+\NormalTok{corr <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(nbadata[, }\DecValTok{-20}\NormalTok{])}
+\NormalTok{corrplot}\OperatorTok{::}\KeywordTok{corrplot}\NormalTok{(corr)}
+
+\CommentTok{# Performing PCA}
+\NormalTok{pca <-}\StringTok{ }\KeywordTok{prcomp}\NormalTok{(nbadata[, }\DecValTok{-20}\NormalTok{])}
+\KeywordTok{library}\NormalTok{(ggplot2)}
+		
+\NormalTok{pca.var <-}\StringTok{ }\NormalTok{pca}\OperatorTok{$}\NormalTok{sdev}\OperatorTok{^}\DecValTok{2}
+
+\NormalTok{df <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{index =} \DecValTok{1}\OperatorTok{:}\DecValTok{19}\NormalTok{, }\DataTypeTok{Cumprop =} \KeywordTok{cumsum}\NormalTok{(pca.var)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(pca.var))}
+\KeywordTok{ggplot}\NormalTok{(df, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ index, }\DataTypeTok{y =}\NormalTok{ Cumprop)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\KeywordTok{xlab}\NormalTok{(}\StringTok{"Principal Component"}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{"Cumulative Proportion of Variation explained"}\NormalTok{)}
+\NormalTok{cols <-}\StringTok{ }\KeywordTok{ifelse}\NormalTok{(nbadata}\OperatorTok{$}\NormalTok{TARGET_5Yrs }\OperatorTok{==}\StringTok{ "0"}\NormalTok{, }\KeywordTok{rgb}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{0.5}\NormalTok{), }\KeywordTok{rgb}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{0.5}\NormalTok{))}
+\KeywordTok{pairs}\NormalTok{(pca}\OperatorTok{$}\NormalTok{x[, }\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{], }\DataTypeTok{col =}\NormalTok{ cols, }\DataTypeTok{pch =} \DecValTok{20}\NormalTok{)}
+
+\CommentTok{# Creation of training and testing set}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1911}\NormalTok{)} \CommentTok{# my roll number as a seed for reproducibility}
+\NormalTok{trainIndex <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(nbadata), }\FloatTok{0.75} \OperatorTok{*}\StringTok{ }\KeywordTok{nrow}\NormalTok{(nbadata))}
+\NormalTok{traindata <-}\StringTok{ }\NormalTok{nbadata[trainIndex, ]}
+\NormalTok{testdata <-}\StringTok{ }\NormalTok{nbadata[}\OperatorTok{-}\NormalTok{trainIndex, ]}
+\KeywordTok{table}\NormalTok{(traindata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+\KeywordTok{table}\NormalTok{(testdata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+
+\CommentTok{# An utility function to get accuracy and confusion matrix}
+\NormalTok{getResults <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(preds, true_labels) \{}
+	\NormalTok{ tab <-}\StringTok{ }\KeywordTok{table}\NormalTok{(preds, true_labels)}
+	\NormalTok{ acc <-}\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(tab))}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(tab)}
+	\KeywordTok{return}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\StringTok{"Confusion Matrix"}\NormalTok{ =}\StringTok{ }\NormalTok{tab, }\StringTok{"Accuracy"}\NormalTok{ =}\StringTok{ }\NormalTok{acc))}
+\NormalTok{\}}
+	\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+	\begin{Highlighting}[]
+\CommentTok{# performing LDA}
+\KeywordTok{library}\NormalTok{(MASS)}
+\NormalTok{fit.lda <-}\StringTok{ }\KeywordTok{lda}\NormalTok{(TARGET_5Yrs }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ traindata)}
+\NormalTok{fit.lda}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.lda)}
+\KeywordTok{getResults}\NormalTok{(preds}\OperatorTok{$}\NormalTok{class, traindata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.lda, }\DataTypeTok{newdata =}\NormalTok{ testdata)}
+\KeywordTok{getResults}\NormalTok{(preds}\OperatorTok{$}\NormalTok{class, testdata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+
+	\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Call:
+lda(TARGET_5Yrs ~ ., data = traindata)
+
+Prior probabilities of groups:
+0         1 
+0.3681592 0.6318408 
+
+Group means:
+GamePlay  MinPlay   Points   FGMade FGAttempt FGSuccess    TPMade
+0 51.52162 14.09703 4.986486 1.924595  4.499189  42.37054 0.2297297
+1 66.01417 20.04850 8.117165 3.147087  6.905039  45.46409 0.2645669
+TPAttempt TPSuccess    FTMade FTAttempt FTSuccess OffRebound DefRebound
+0 0.7548649  19.17595 0.9110811  1.310541  68.35027  0.7113514   1.542973
+1 0.8124409  19.11559 1.5612598  2.161732  71.74315  1.2075591   2.370866
+TotalRebound   Assist     Steal     Block  Turnover
+0     2.253514 1.201351 0.4862162 0.2486486 0.9262162
+1     3.578110 1.792441 0.7031496 0.4329134 1.3788976
+
+Coefficients of linear discriminants:
+LD1
+GamePlay      0.0342093155
+MinPlay      -0.0213688200
+Points       -0.4089458026
+FGMade        0.0643446173
+FGAttempt     0.4133374765
+FGSuccess     0.0664504699
+TPMade        3.2198175925
+TPAttempt    -1.0358430463
+TPSuccess     0.0005456628
+FTMade        0.4682341358
+FTAttempt    -0.0301922875
+FTSuccess     0.0238139973
+OffRebound    1.2406807679
+DefRebound    0.2921629002
+TotalRebound -0.5239048104
+Assist        0.1448387323
+Steal         0.1023330528
+Block         0.4119611377
+Turnover     -0.0389136136
+
+# Training Set Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0 195  87
+1 175 548
+
+$Accuracy
+[1] 0.7393035
+
+# Testing Set Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0  68  38
+1  71 158
+
+$Accuracy
+[1] 0.6746269
+\end{verbatim}
+
+\begin{Shaded}
+	\begin{Highlighting}[]
+\CommentTok{# Performing QDA}
+\NormalTok{fit.qda <-}\StringTok{ }\KeywordTok{qda}\NormalTok{(TARGET_5Yrs }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ traindata)}
+\NormalTok{fit.qda}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.qda)}
+\KeywordTok{getResults}\NormalTok{(preds}\OperatorTok{$}\NormalTok{class, traindata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.qda, }\DataTypeTok{newdata =}\NormalTok{ testdata)}
+\KeywordTok{getResults}\NormalTok{(preds}\OperatorTok{$}\NormalTok{class, testdata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+		
+	\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Call:
+qda(TARGET_5Yrs ~ ., data = traindata)
+
+Prior probabilities of groups:
+0         1 
+0.3681592 0.6318408 
+
+Group means:
+GamePlay  MinPlay   Points   FGMade FGAttempt FGSuccess    TPMade
+0 51.52162 14.09703 4.986486 1.924595  4.499189  42.37054 0.2297297
+1 66.01417 20.04850 8.117165 3.147087  6.905039  45.46409 0.2645669
+TPAttempt TPSuccess    FTMade FTAttempt FTSuccess OffRebound DefRebound
+0 0.7548649  19.17595 0.9110811  1.310541  68.35027  0.7113514   1.542973
+1 0.8124409  19.11559 1.5612598  2.161732  71.74315  1.2075591   2.370866
+TotalRebound   Assist     Steal     Block  Turnover
+0     2.253514 1.201351 0.4862162 0.2486486 0.9262162
+1     3.578110 1.792441 0.7031496 0.4329134 1.3788976
+
+# Training Set Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0 321 234
+1  49 401
+
+$Accuracy
+[1] 0.718408
+
+# Testing Set Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0 105  83
+1  34 113
+
+$Accuracy
+[1] 0.6507463
+\end{verbatim}
+
+
+\begin{Shaded}
+	\begin{Highlighting}[]
+\CommentTok{# Performing Classification tree}
+\KeywordTok{library}\NormalTok{(tree)}
+\NormalTok{fit.tree <-}\StringTok{ }\NormalTok{tree}\OperatorTok{::}\KeywordTok{tree}\NormalTok{(TARGET_5Yrs }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ traindata)}
+\KeywordTok{summary}\NormalTok{(fit.tree)}
+
+\KeywordTok{plot}\NormalTok{(fit.tree)} \CommentTok{# plot decision tree}
+\KeywordTok{text}\NormalTok{(fit.tree, }\DataTypeTok{pretty =} \DecValTok{0}\NormalTok{)}
+
+
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.tree, }\DataTypeTok{type =} \StringTok{"class"}\NormalTok{)}
+\KeywordTok{getResults}\NormalTok{(preds, traindata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.tree, }\DataTypeTok{newdata =}\NormalTok{ testdata, }\DataTypeTok{type =} \StringTok{"class"}\NormalTok{)}
+\KeywordTok{getResults}\NormalTok{(preds, testdata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+
+	\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+
+Classification tree:
+tree::tree(formula = TARGET_5Yrs ~ ., data = traindata)
+Variables actually used in tree construction:
+[1] "GamePlay"   "OffRebound" "FGMade"     "TPSuccess" 
+Number of terminal nodes:  7 
+Residual mean deviance:  1.085 = 1083 / 998 
+Misclassification error rate: 0.2726 = 274 / 1005 
+
+# Training Set Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0 188  92
+1 182 543
+
+$Accuracy
+[1] 0.7273632
+
+# Testing Set Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0  62  35
+1  77 161
+
+$Accuracy
+[1] 0.6656716
+
+\end{verbatim}
+
+\begin{Shaded}
+	\begin{Highlighting}[]
+\CommentTok{# Using SVM}
+\KeywordTok{library}\NormalTok{(e1071)}
+\NormalTok{fit.svm <-}\StringTok{ }\KeywordTok{svm}\NormalTok{(TARGET_5Yrs }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ traindata, }\DataTypeTok{kernel =} \StringTok{"radial"}\NormalTok{)}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.svm)}
+\KeywordTok{getResults}\NormalTok{(preds, traindata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+\NormalTok{preds <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(fit.svm, }\DataTypeTok{newdata =}\NormalTok{ testdata)}
+\KeywordTok{getResults}\NormalTok{(preds, testdata}\OperatorTok{$}\NormalTok{TARGET_5Yrs)}
+
+	\end{Highlighting}
+\end{Shaded}
+		
+\begin{verbatim}
+# Training Data Metrics
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0 207  88
+1 163 547
+		
+$Accuracy
+[1] 0.7502488
+	
+# Testing Set Metrics	
+$`Confusion Matrix`
+true_labels
+preds   0   1
+0  88  40
+1  51 156
+
+$Accuracy
+[1] 0.728358
+\end{verbatim}
+		
+
+
+
+
+
+
+
+
+
+\end{document}

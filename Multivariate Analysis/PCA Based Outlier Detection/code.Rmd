@@ -1,0 +1,168 @@
+---
+title: "Outlier Detection in High Dimensional Data using PCA"
+author: "Subhrajyoty Roy (MB1911)"
+date: "September 20, 2019"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "", message = FALSE, warning = FALSE)
+```
+
+# Introduction
+
+Principal Component Analysis is a very useful dimension reduction technique which can effectively find out the dispersion of the dataset from its center cluster in different direction in the order of magnitude of the dispersion, so that, the most significant part of the dispersion is comprised in a very few principal components. In this assignment, we shall discuss the use Principal components to detect outliers in high dimensional data, where there is not simple way to visualize the data and detect the outliers by mere inspection. Applying the PCA would allow us to capture the variablity in the data in two or three dimensions, thereby allowing us to have a visualization of the data.
+
+# Creation of Contaminated Dataset
+
+We first consider a 5-variate normal distribution whose mean vector and covariance matrix is generated as follows. For the mean vector, each component is chosen from a uniform $(-1,1)$ distribution, while the covariance matrix is generated according to a Wishart distribution. We also generate mean vector for the contaminated distribution where each component is chosen from a uniform $(-5,5)$ distribution.
+
+```{r}
+set.seed(1911)  # set my roll number as seed for reproducibilty
+mu1 <- runif(5, min = -1, max= 1)  # mean for regular distribution
+mu2 <- runif(5, min = -5, max = 5)  # mean for contaminated distribution
+
+mat <- diag(5)  + matrix(1, nrow = 5, ncol = 5)
+x <- rWishart(2, 5, mat)  # generate 5x5 covariance matrix
+Sigma1 <- x[,,1]  # sigma for regular distribution
+Sigma2 <- x[,,2]  # sigma for contamination distribution
+```
+
+```{r echo = FALSE}
+write_vecex <- function(x) {
+    x <- round(x, digits = 2)
+    begin <- "$$\\begin{bmatrix}"
+    end <- "\\end{bmatrix}$$"
+    X <- paste(x, collapse = "\\\\")
+    c(begin, X, end)
+}
+
+
+write_matex <- function(x) {
+  x <- round(x, digits = 2)
+  begin <- "$$\\begin{bmatrix}"
+  end <- "\\end{bmatrix}$$"
+  X <-
+    apply(x, 1, function(x) {
+      paste(
+        paste(x, collapse = "&"),
+        "\\\\"
+      )
+    })
+  c(begin, X, end)
+}
+
+```
+
+
+Therefore, we have the following, 
+
+* The regular distribution is a 5-variate normal distribution with mean vector `r write_vecex(mu1)` and covariance matrix `r write_matex(Sigma1)`
+
+* The contaminated distribution is a 5-variate normal distribution with mean vector `r write_vecex(mu2)` and covariance matrix `r write_matex(Sigma2)`
+
+Now, we generate $100$ observations from each of distributions, the regular and the contaminated one. Then, we generate $100$ bernoulli random variables with success probability $0.05$. The observed dataset is taken as;
+
+$$X_i = B_iC_i + (1-B_i)R_i \qquad i=1,2,\dots100$$
+where $C_i$ is the $i$-th sample from Contamined distribution, $B_i$ is the $i$-th bernoulli trial result, and $R_i$ is the $i$-th sample from Regular distribution.
+
+```{r}
+library(MASS)
+set.seed(1911)  # my roll number
+regular_samples <- mvrnorm(n = 100, mu = mu1, Sigma = Sigma1)
+contaminated_samples <- mvrnorm(n = 100, mu = mu2, Sigma = Sigma2)
+
+bernoulli_trials <- rbinom(n = 100, size = 1, prob = 0.05)
+
+final_samples <- ((1 - bernoulli_trials)*regular_samples) + 
+    (bernoulli_trials * contaminated_samples)
+
+print(paste0("There are ", sum(bernoulli_trials), " many outliers"))
+```
+
+# Visualization of the Data
+
+Since the data is 5-variate, hence we cannot visualize it in 5-dimensional space. However, we can look at pairwise set of predictors and plot the datapoints on the basis of those variables only. We also color the outliers to see whether the plots does allow one to detect the outliers.
+
+```{r fig.height = 9}
+pairs(final_samples, col = ifelse(bernoulli_trials, 
+                                  "red", "black"), pch = 19)
+```
+
+Note that, no two variables can detect the outliers with confidence. Hence, we need to specifically look at the directions at which there is most variability in the data, hence effectively look at the few principle components.
+
+# Computation of Principal Component
+
+We compute the principal components of the above contaminated dataset. 
+
+```{r}
+pc <- prcomp(final_samples)  # computes the principal components
+pc
+```
+
+We only consider the first two principal components, as these are the only ones will be used to find out the outliers. Before we compute the linear combination of the variables denoted by principal components, we make the screeplot in order to find out how much of the total variation is explained by the principal components. 
+
+```{r fig.height=3}
+par(mar = c(2, 4, 1, 2))
+screeplot(pc, type = "lines")
+```
+
+Now, to compute the principal components, we multiply the data matrix with the rotation matrix obtained from PCA.
+
+```{r}
+# computes the PC1 and PC2
+pcdata <- final_samples %*% pc$rotation[,c(1,2)]  
+```
+
+
+Now, we make a plot of those principal components to see whether we can actually detect the outlier out of this.
+
+```{r}
+plot(pcdata, col = ifelse(bernoulli_trials, "red", "black"), pch = 19)
+
+```
+
+clearly, as we see from the above plot, the outliers are much more prominent in principal component space.
+
+# Outlier Detection
+
+Let, $C$ be a robust measure of dispersion matrix of 1st and 2nd principal component, while $T$ be a robust measure of center of 1st and 2nd principal components. Also, let $Y$ be the vector of 1st and 2nd principal components. Then, the Mahalanobis type Distance squared;
+
+$$F = (Y - T)^{\top}C^{-1}(Y-T)$$
+should follow a chi-sqaure distribution with 2 degrees of freedom (since $C$ is $2\times 2$ matrix). We consider any point as outlier if its mahalanobis distance exceeds the $0.99$-th quantile of central $\chi^2_2$ distribution.
+
+```{r}
+x <- cov.rob(pcdata)
+dists <- mahalanobis(pcdata, center = x$center, cov = x$cov)
+
+detected_outliers <- (dists > qchisq(p = 0.99, df = 2))
+print(which(detected_outliers))
+true_outliers <- which(bernoulli_trials == 1)
+print(true_outliers)
+```
+
+
+We find that there are some difference between detected outliers and the true outliers. If we look back to the plot, we get the following:
+
+```{r}
+plot(pcdata, col = ifelse(bernoulli_trials, "red", "black"), 
+     pch = ifelse(detected_outliers, 17, 19))
+
+```
+
+In the above plot, the detected outliers are drawn using triangles, while the true outliers are coloured in red. Note that, the above procedure using principal component space to detect outliers correctly detected all the outliers. However, it also detected 3 more datapoints as outliers which are not truly obtained from the contaminated distribution.  
+
+
+
+# THANK YOU
+
+
+
+
+
+

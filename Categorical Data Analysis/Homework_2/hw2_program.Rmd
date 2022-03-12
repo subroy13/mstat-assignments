@@ -1,0 +1,120 @@
+---
+title: "HW2 Program"
+author: "Subhrajyoty Roy"
+date: "August 25, 2019"
+output: 
+    pdf_document:
+        keep_tex : true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "", warning = FALSE)
+```
+
+
+We first load the required packages in *R*.
+
+```{r}
+library(vcd)
+library(lpSolve)
+```
+
+
+Now, we load the *SexualFun* data from **vcd** package.
+
+```{r}
+data <- vcd::SexualFun
+ftable(data)
+```
+
+
+We first obtain the actual values of Cohen's Kappa $\kappa$ and the measure $\lambda_r$ for the actual table;
+
+```{r}
+kp <- Kappa(data)   #compute the actual Kappa 
+print(kp)
+```
+
+We note that the actual value of Cohen's Kappa for *SexualFun* data is $0.12933025$.
+
+Consider the following code which computes $\lambda_r$;
+
+```{r}
+n <- sum(data)
+rowMar <- rowSums(data)/n
+colMar <- colSums(data)/n
+
+a <- sum(diag(data))/n
+b <- max((rowMar + colMar)/2)
+
+lambda <- (a - b)/(1-b)
+print(lambda)
+```
+
+We find that the actual value of $\lambda_r$ for *SexualFun* data is $0$.
+
+
+Now, we consider the minimization and maximization problem, where we try to find extremal values of $\sum_i p_{ii}$ or correspondingly $\sum_i n_{ii}$. We shall use **lpSolve** package to solve the corresponding linear programming for us.
+
+```{r}
+lpMax = lp.transport(cost.mat = diag(4), direction = "max", 
+             row.signs = rep("==", 4), row.rhs = rowSums(data), 
+             col.signs = rep("==", 4), col.rhs = colSums(data))
+
+```
+
+The maximizing configuration would look like;
+
+```{r}
+print(lpMax$solution)
+```
+
+Therefore, the maximum value of Cohen's kappa and $\lambda_r$ is obtained using the following code;
+
+```{r}
+Kappa(lpMax$solution)
+
+a <- lpMax$objval/n
+lambda <- (a - b)/(1-b)
+print(lambda)
+```
+
+Therefore, the maximum value of Cohen's Kappa given the marginals is $0.8799$, while the maximum value of $\lambda_r$ given the marginals is $0.8621$. 
+
+We use similar method to find the minimum value of these measures given the marginals.
+
+```{r}
+lpMin = lp.transport(cost.mat = diag(4), direction = "min", 
+             row.signs = rep("==", 4), row.rhs = rowSums(data), 
+             col.signs = rep("==", 4), col.rhs = colSums(data))
+
+```
+
+The maximizing configuration would look like;
+
+```{r}
+print(lpMin$solution)
+```
+
+```{r}
+Kappa(lpMin$solution)
+
+a <- lpMin$objval/n
+lambda <- (a - b)/(1-b)
+print(lambda)
+```
+
+Therefore, the maximum value of Cohen's Kappa given the marginals is $-0.3661$, while the maximum value of $\lambda_r$ given the marginals is $-0.5689$. 
+
+
+
+
+
+
+
+
+
+
+

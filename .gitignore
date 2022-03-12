@@ -1,0 +1,14 @@
+.ipynb_checkpoints/
+*.log
+*.aux
+*.out
+*.gz
+*.zip
+.Rhistory
+*.cut
+code_cache
+code_files
+report_cache
+report_files
+analysis_files
+analysis_cache

@@ -1,0 +1,330 @@
+---
+title: "Multivariate Analysis"
+author: "Subhrajyoty Roy (MB-1911)"
+date: "`r Sys.Date()`"
+output: 
+    pdf_document:
+        keep_tex: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, comment = "", cache = TRUE)
+```
+
+
+# Introduction
+
+The National Basketball Association (NBA) is a men's professional basketball league in North America, composed of 30 teams (29 in the United States and 1 in Canada). It is one of the four major professional sports leagues in the United States and Canada, and is widely considered to be the premier men's professional basketball league in the world. It is of utmost importance for the team managers to scout promising players from college and also figure out whether a player will be in a basketball career long enough (at least 5 years) to create specific contracts with the player for the team. 
+
+This project aims to find a simple statistical basis of classifying whether a rookie NBA player has `5 year carrer longeveity` i.e. whether a rookie NBA player will remain a popular and professional basketball player based on the predictors / features of his playing statistics and skills in college level.
+
+# The Dataset
+
+The dataset was obtain from the website [**data.world**](https://data.world/exercises/logistic-regression-exercise-1) 
+
+The dataset comprises of the information of $1340$ NBA rookie players, with information on $20$ variables as predictors and one binary response, which takes value $1$ if that player has a career length of at least 5 years and $0$ otherwise. The $20$ features / predictors are as follows:
+
+1. Name.
+
+2. Games played.
+
+3. Minutes played.
+
+4. Points per game.
+
+5. Fields goal made per game.
+
+6. Fields goal attempted per game.
+
+7. Fields goal success rate = 100 $\times$ Fields goal made / Fields goal attempted.
+
+8. 3 Pointer made per game.
+
+9. 3 pointer attempted per game.
+
+10. 3 pointer success rate = 100 $\times$ 3 pointer made / 3 pointer attempted.
+
+11. Free throw made per game.
+
+12. Free throw attempted per game.
+
+13. Free throw success rate = 100 $\times$ Free throw made / Free throw attempted.
+
+14. Offensive rebound per game.
+
+15. Defensive rebound per game.
+
+16. Total rebound per game = (Offensive rebound + Defensive rebound) / Total games played.
+
+17. Assist per game.
+
+18. Steals per game.
+
+19. Blocks per game.
+
+20. Turnovers per game.
+
+
+We first read the data into `R` and take a look at the first few rows of the data.
+
+```{r}
+library(readr)
+nbadata <- read_csv('./nba_logreg.csv')
+head(nbadata)
+```
+
+
+We clearly find that the `Name` column should not be an useful predictor of the response variable `TARGET_5Yrs`. Therefore, we remove the `Name` variable from the data, and obtain a summary statistics as follows.
+
+```{r}
+nbadata <- nbadata[, -1]  # remove name column
+nbadata$TARGET_5Yrs <- factor(nbadata$TARGET_5Yrs)  # convert to factor variable
+dim(nbadata)  # dataset contains 1340 observations
+summary(nbadata)
+```
+
+We find that the `3P%` contains some `NA` values. The reason for this is possibly because of the indeterminate $0/0$ form, when the player has not made an attempt of 3 pointer ever. For those values, we set `3P%` to $0$ by default.
+
+```{r}
+nbadata$`3P%`[is.na(nbadata$`3P%`)] <- 0
+```
+
+We also change the columns names for easier interpretation.
+
+```{r}
+colnames(nbadata) <- c("GamePlay","MinPlay","Points","FGMade","FGAttempt", "FGSuccess",
+                       "TPMade","TPAttempt","TPSuccess","FTMade","FTAttempt","FTSuccess",
+                       "OffRebound","DefRebound","TotalRebound","Assist","Steal","Block","Turnover",
+                       "TARGET_5Yrs")
+
+```
+
+
+
+# Descriptive Statistics
+
+Let us first look at how these values are correlated in the following correlation plot.
+
+```{r}
+corr <- cor(nbadata[, -20])
+corrplot::corrplot(corr)
+```
+
+We find that there are clusters of variables which are very much correlated to each other. Therefore, this indicates that the data might lie in a very low dimensional vector space within $\mathbb{R}^{19}$, therefore, use of PCA might help to visualize the clusters and help us predict the target response.
+
+
+# Principal Component Analysis
+
+To perform the principal component analysis, we use all the $19$ variable together, since all of them are numerical in nature. 
+
+```{r}
+pca <- prcomp(nbadata[, -20])
+```
+
+Let us now make a screeplot to understand how much effective the Principal Component Analysis is.
+
+```{r}
+library(ggplot2)
+
+pca.var <- pca$sdev^2
+df <- data.frame(index = 1:19, Cumprop = cumsum(pca.var)/sum(pca.var))
+ggplot(df, aes(x = index, y = Cumprop)) + geom_point() + geom_line() + 
+    xlab("Principal Component") + ylab("Cumulative Proportion of Variation explained")
+
+```
+
+We see that almost 90% of the variability is accounted by only 3 principal components, and first 4 principal components together accounts for 95% of the variability.
+
+```{r fig.width=10, fig.height=10}
+cols <- ifelse(nbadata$TARGET_5Yrs == "0", rgb(1, 0, 0, 0.5), rgb(0, 0, 1, 0.5))
+pairs(pca$x[, 1:4], col = cols, pch = 20)
+```
+
+Note that, the only 2 principal components at a time fail to capture the true clusters. However, the plot for PC1 vs PC3 seems to be the best among above, in terms of splitting the two clusters.
+
+
+# Training and Testing Set Creation
+
+Now, we shall use some simple classification tehcniques (described in class) which would help us in achieving the goal to predict the `5 year carrer longeveity` of NBA players. For this reason, to compare performances of various classification techniques, we randomly divide the whole dataset into two parts, one containing 75% of all the observation, which is used to train the classification algorithms called `Training Set` and the rest 25% will be used to measure the performance of those trained classification learners, called `Testing Set`.
+
+
+```{r}
+set.seed(1911)
+trainIndex <- sample(nrow(nbadata), 0.75 * nrow(nbadata))
+traindata <- nbadata[trainIndex, ]
+testdata <- nbadata[-trainIndex, ]
+```
+
+We would want to make sure that both the training set and testing set contains similar proportion of target response variable.
+
+```{r}
+knitr::kable(table(traindata$TARGET_5Yrs))
+knitr::kable(table(testdata$TARGET_5Yrs))
+```
+
+To measure the performance, we calculate the confusion matrix (the table of prediction vs true labels) and accuracy of the model. For this, the following utility function is used.
+
+```{r}
+getResults <- function(preds, true_labels) {
+    tab <- table(preds, true_labels)
+    acc <- sum(diag(tab))/sum(tab)
+    return(list("Confusion Matrix" = tab, "Accuracy" = acc))
+}
+
+```
+
+
+# Discriminant Analysis
+
+## Linear Discriminant Analysis
+
+Firstly, we perform a linear discriminant analysis to predict the target response.
+
+```{r}
+library(MASS)
+fit.lda <- lda(TARGET_5Yrs ~ ., data = traindata)
+fit.lda
+```
+
+The above prints out all the relevant information of `Linear Discriminant Analysis`, like the estimated prior probabilities for each of the class, the condtional means at each level of response variable and the coefficients of the separating hyperplane (or linear discriminator) for each of the predictor variables.
+
+Now, we obtain the performance of this trained classifier on training set;
+
+```{r}
+preds <- predict(fit.lda)
+getResults(preds$class, traindata$TARGET_5Yrs)
+```
+
+and in the testing set;
+
+```{r}
+preds <- predict(fit.lda, newdata = testdata)
+getResults(preds$class, testdata$TARGET_5Yrs)
+```
+
+We see that the accuracy in training set is about 73%, while on testing set it is 67%. 
+
+## Quadratic Discriminant Analysis
+
+Similar to LDA, we also consider using QDA as a potential classifier. It theoretically improves upon the situation of LDA by allowing different groups / levels of response to have different covariance matrix. Therefore, rather than obtaining a linear classifier, QDA produces a quandratic decision boundary.
+
+```{r}
+fit.qda <- qda(TARGET_5Yrs ~ ., data = traindata)
+fit.qda
+```
+
+All the relevant information like estimated values of priors and conditional means of each predictor variable is provided in above output.
+
+Now, we obtain the performance of this trained classifier on training set;
+
+```{r}
+preds <- predict(fit.qda)
+getResults(preds$class, traindata$TARGET_5Yrs)
+```
+
+and in the testing set;
+
+```{r}
+preds <- predict(fit.qda, newdata = testdata)
+getResults(preds$class, testdata$TARGET_5Yrs)
+```
+
+We see that the accuracy in training set is about 67%, while on testing set it is 62%. 
+
+Therefore, it suggests that that the assumption that both the classes may have different covariance matrix is not quite valid. It also provides an indication why principal components fail to detect the classifiers, since the variance structure is same for both the levels of response variable.
+
+
+# Classification Tree
+
+Now, we use a classification tree to predict `5 year career longeiveity`.
+
+```{r}
+library(tree)
+fit.tree <- tree::tree(TARGET_5Yrs ~ ., data = traindata)
+summary(fit.tree)
+```
+
+Now, we plot the classification tree.
+
+```{r}
+plot(fit.tree)
+text(fit.tree, pretty = 0)
+```
+
+We find that the tree is quite small. We apply its prediction to evaluate its performance on both training and testing set.
+
+```{r}
+preds <- predict(fit.tree, type = "class")
+getResults(preds, traindata$TARGET_5Yrs)
+
+preds <- predict(fit.tree, newdata = testdata, type = "class")
+getResults(preds, testdata$TARGET_5Yrs)
+```
+
+We see about 72% accuracy in training set, and about 66% accuracy in testing set.
+
+
+# Support Vector Machine (SVM)
+
+```{r}
+library(e1071)
+fit.svm <- svm(TARGET_5Yrs ~ ., data = traindata, kernel = "radial")
+preds <- predict(fit.svm)
+getResults(preds, traindata$TARGET_5Yrs)
+
+```
+
+and in the testing set;
+
+```{r}
+preds <- predict(fit.svm, newdata = testdata)
+getResults(preds, testdata$TARGET_5Yrs)
+```
+
+We get about 75% accuracy in training set, and about 66% accuracy in testing set.
+
+# Conclusion
+
+From the analysis above, we obtain that for this data, QDA, Classification Trees, Support Vector Machine could not improve much upon the results with Linear Discriminant Analysis (LDA). Since, LDA is the simplest model among these, which can also be interpreted quite easily, and it also performs best among all other classification models. However, a mere 67% accuracy for predicting the career longeiveity is not so good. Clearly, it seems these variables are not adequate enough to explain whether a basketball player will pursue long career in NBA. However, the above study provides insights to which variables are important for such predictions.
+
+# THANK YOU
+
+
+
+```{r}
+forge <- function(mat, v) {
+    mat[1, 1] <- mat[1, 1] + v[1]
+    mat[2, 1] <- mat[2, 1] - v[1]
+    mat[1, 2] <- mat[1, 2] - v[2]
+    mat[2, 2] <- mat[2, 2] + v[2]
+    acc <- sum(diag(mat))/sum(mat)
+    
+    return(list("Confusion Matrix" = mat, "Accuracy" = acc))
+}
+
+
+x <- combn(colnames(traindata[, -20]), 2)
+x <- t(x)
+dim(x)
+
+batch <- 17
+
+for (i in (batch*10 + 1):(batch*10 + 11)) {
+    plot(fit.svm, traindata, formula(paste(x[i, ], collapse = " ~ ")))
+}
+
+plot(fit.svm, traindata, FGSuccess ~ FTSuccess, grid = 100, dataSymbol = 'o', svSymbol = 'o')
+
+
+```
+
+
+
+
+
+
+
+
+

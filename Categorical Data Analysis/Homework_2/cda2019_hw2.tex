@@ -1,0 +1,697 @@
+\documentclass[12pt]{article}
+\usepackage[usenames]{color} %used for font color
+\usepackage{amsmath,amssymb,amsthm,amsfonts} %maths
+\usepackage[utf8]{inputenc} %useful to type directly accentuated characters
+\usepackage{hyperref}
+\usepackage[margin=0.3in]{geometry}
+\usepackage{graphicx}
+
+% setting up R coding environment
+\usepackage{color}
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+
+
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+
+\usepackage{float}
+
+\usepackage{enumitem}
+
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+\newtheoremstyle{problemstyle}  							% <name>
+        {3pt}                                               % <space above>
+        {3pt}                                               % <space below>
+        {\normalfont}                               		% <body font>
+        {}                                                  % <indent amount}
+        {\bfseries}                 						% <theorem head font>
+        {\normalfont\bfseries.}         					% <punctuation after theorem head>
+        {.5em}                                          	% <space after theorem head>
+        {}                                                  % <theorem head spec (can be left empty, meaning `normal')>
+\theoremstyle{problemstyle}
+
+\newtheorem{problem}{}
+\newtheorem{solution}{Solution}
+\newtheorem*{solution*}{Solution}
+
+\newcommand{\createcontingencytable}[4]{ %
+% #1=table name
+% #2=first column name
+% #3=new row sum name
+% #4=new column sum name
+\pgfplotstablecreatecol[
+    create col/assign/.code={% In each row ... 
+        \def\rowsum{0}
+        \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+        % ... loop over all columns, summing up the elements
+        \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+            \pgfmathsetmacro\rowsum{\rowsum+\thisrowno{\col}}
+        }
+        \pgfkeyslet{/pgfplots/table/create col/next content}\rowsum
+    }
+]{#3}{#1}%
+%
+% Transpose the table, so we can repeat the summation step for the columns
+\pgfplotstabletranspose[colnames from={#2},input colnames to={#2}]{\intermediatetable}{#1}
+%
+% Sums for each column
+\pgfplotstablecreatecol[
+    create col/assign/.code={%
+        \def\colsum{0}
+        \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+        \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+            \pgfmathsetmacro\colsum{\colsum+\thisrowno{\col}}
+        }
+        \pgfkeyslet{/pgfplots/table/create col/next content}\colsum
+    }
+]{#4}\intermediatetable
+%
+% Transpose back to the original form
+\pgfplotstabletranspose[colnames from=#2, input colnames to=#2]{\contingencytable}{\intermediatetable}
+}
+%
+
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+\def\ed { \stackrel{d}{=} }
+\def\convd { \stackrel{d}{\rightarrow} }
+\def\corr{\mathrm{corr}}
+\def\normal{\mathcal{N}}
+\def\R{\mathbb{R}}
+\def\Pr{\mathbb{P}}
+\def\M{\mathcal{M}}
+\def\F{\mathcal{F}}
+
+\newcommand{\indep}{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}}
+
+
+\begin{document}
+
+\begin{center}{\large\textbf{Homework 2} \hfill \large \textit{Categorical Data Analysis, S. S. Mukherjee, Fall 2019}} 
+\end{center}
+\hrule\hrule\vskip3pt
+Topics: Measures of association and agreement \hfill Due on August 29, 2019\vskip3pt
+\hrule\hrule\vskip3pt\noindent
+Name of student: SUBHRAJYOTY ROY \\
+Roll number: MB1911
+\vskip3pt\noindent	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{problem}
+\textbf{Relationship between Kruskal and Goodman's $\lambda$ and Yule's $Y$} \hfill [8]\vskip3pt\noindent
+% Problem statement
+Consider a $2 \times 2$ multinomial contingency table. Show that the odds ratio $\theta = \frac{p_{11} p_{22}}{p_{12}p_{21}}$ is invariant under transformations of tables of the form
+\[
+    (p_{ij}) \mapsto (s_i t_j p_{ij}), \quad s_i, t_j > 0.
+\]
+Now show that one can always make the marginals equal to $1/2$ by choosing a suitable transformation of the above type (i.e. without changing the odds ratio). Show that for such a transformed table Kruskal and Goodman's $\lambda_{C\mid R} = \lambda_{R \mid C} = |Y|$, where $Y = \frac{\sqrt{\theta} - 1}{\sqrt{\theta} + 1}$ is Yule's measure of colligation.
+\end{problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Solution to problem 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{solution}
+ 	We consider the odds ratio under the transformation $(p_{ij}) \mapsto (s_i t_j p_{ij}), \quad s_i, t_j > 0$. Let us call $s_i t_j p_{ij} = p'_{ij}$. 
+ 	\begin{align*}
+ 		\theta_{\text{new}} & = \frac{p'_{11}p'_{22}}{p'_{12}p'_{21}}\\
+ 		& = \frac{s_1t_1p_{11}\times s_2t_2p_{22}}{s_1t_2p_{12}\times s_2t_1p_{21}}\\
+ 		& = \frac{p_{11}p_{22}}{p_{12}p_{21}} \text{, since } s_i, t_j > 0\\
+ 		& = \theta_{\text{old}}
+ 	\end{align*}
+ 	
+ 	For some choice of $s_i, t_j$, we have the following contingency table;
+ 	\begin{table}[H]
+ 		\centering 
+ 		\begin{tabular}{cccc}
+ 			\toprule
+ 			 & $C=1$ & $C=2$\\
+ 			\midrule 
+ 			$R=1$ & $s_1t_1p_{11}$ & $s_1t_2p_{12}$\\
+ 			$R=2$ & $s_2t_1p_{21}$ & $s_2t_2p_{22}$\\
+ 			\bottomrule
+ 		\end{tabular}	
+ 	\end{table}
+ 	
+ 	Note that, if we have all the marginals equal to $1/2$, such a contingency table would look as follows;
+ 	\begin{table}[H]
+ 		\centering 
+ 		\begin{tabular}{cccc}
+ 			\toprule
+ 			 & $C=1$ & $C=2$ & Total\\
+ 			\midrule 
+ 			$R = 1$ & $x$ & $\frac{1}{2} - x$ & $\frac{1}{2}$\\
+ 			$R=2$ & $\frac{1}{2} - x$ & $x$ & $\frac{1}{2}$\\
+ 			\midrule
+ 			Total & $\frac{1}{2}$ & $\frac{1}{2}$ & 1\\
+ 			\bottomrule
+ 		\end{tabular}	
+ 	\end{table}
+ 	for some $x \leq \frac{1}{2}$. Now, consider the following choice;
+ 	\begin{align}
+ 		\label{eqn:s1}
+ 		s_1 & = \frac{x}{p_{11}}\\
+ 		\label{eqn:t1}
+ 		t_1 & = 1\\
+ 		\label{eqn:s2}
+ 		s_2 & = \frac{0.5 - x}{p_{21}}\\
+ 		\label{eqn:t2}
+ 		t_2 & = \frac{(0.5-x)}{x} \times \frac{p_{11}}{p_{12}}
+ 	\end{align}
+ 	Note that, the above choices of $s_i, t_j$ transforms the entries at $(1,1), (1,2), (2,1)$ to the desired choices. However, the entry at $(2,2)$ position matches only if;
+ 	\begin{align*}
+ 		& \frac{(0.5 - x)}{p_{21}}\times \frac{(0.5-x)}{x}\frac{p_{11}}{p_{12}}\times p_{22} = x\\
+ 		\Rightarrow & \frac{(0.5 - x)^2}{x} \frac{p_{11}p_{22}}{p_{12}p_{21}} = x\\
+ 		\Rightarrow & \frac{x^2}{(0.5-x)^2} = \theta \text{, the odds ratio}\\
+ 		\Rightarrow & \frac{x}{0.5 -x} = \sqrt{\theta} \text{, since both sides are positive}\\
+ 		\Rightarrow & x = \frac{1}{2}\frac{\sqrt{\theta}}{(1 + \sqrt{\theta})}	
+ 	\end{align*}
+ 	
+ 	Therefore, if we choose such an $x$, we can obtain corresponding transformation $s_i, t_j$'s as obtained from the set of equations \ref{eqn:s1}, \ref{eqn:t1},\ref{eqn:s2} and \ref{eqn:t2}, which makes the marginals equal to $\frac{1}{2}$.
+ 	
+ 	Now, consider the transformed table with marginals equal to $0$. Note that, there are two possible cases.
+ 	\begin{enumerate}[label=(\alph*),leftmargin=4\parindent]
+ 		\item[\textbf{Case 1:}] Assume, $x \geq \frac{1}{4}$. In this case, $\max{x, (\frac{1}{2} - x)} = x$. Hence, from the formula of Kruskal's and Goodman's $\lambda_{C\mid R}$, we obtain;
+ 		\begin{align*}
+ 			\lambda_{C\mid R} & = \frac{p_{1m} + p_{2m} - p_{\cdot m}}{1 - p_{\cdot m}}\\
+ 			& = \frac{x + x - 0.5}{1 - 0.5}\\
+ 			& = (4x - 1)\\
+ 			& = \frac{2\sqrt{\theta}}{(1 + \sqrt{\theta})} - 1\\
+ 			& = \frac{\sqrt{\theta} - 1}{(1 + \sqrt{\theta})}
+ 		\end{align*}
+ 		Since, $x \geq \frac{1}{4}$, we have $(4x - 1) \geq 0$, and hence $\theta \geq 1$. Which shows that the above quantity is non-negative. 
+ 		Also note that, if we consider $\lambda_{R \mid C}$, then we know that $p_{m1} = p_{m2} = x$, and the column marginals will be $\frac{1}{2}$ as before. Therefore, similarly proceeding, we would obtain;
+ 		$$\lambda_{R \mid C} = \frac{\sqrt{\theta} - 1}{(1 + \sqrt{\theta})}$$
+ 		
+ 		\item[\textbf{Case 2:}] Assume, $x < \frac{1}{4}$. In this case, $\max{x, (\frac{1}{2} - x)} = (0.5 - x)$. Hence, from the formula of Kruskal's and Goodman's $\lambda_{C\mid R}$, we obtain;
+ 		\begin{align*}
+ 		\lambda_{C\mid R} & = \frac{p_{1m} + p_{2m} - p_{\cdot m}}{1 - p_{\cdot m}}\\
+ 		& = \frac{(0.5 - x) + (0.5 - x) - 0.5}{1 - 0.5}\\
+ 		& = (1 - 4x)\\
+ 		& = 1 - \frac{2\sqrt{\theta}}{(1 + \sqrt{\theta})}\\
+ 		& = \frac{1 - \sqrt{\theta}}{(1 + \sqrt{\theta})}
+ 		\end{align*}
+ 		Since, $x < \frac{1}{4}$, we have $(1 - 4x) \geq 0$, and hence $\theta < 1$. Which shows that the above quantity is non-negative. 
+ 		Also note that, if we consider $\lambda_{R \mid C}$, then we know that $p_{m1} = p_{m2} = x$, and the column marginals will be $\frac{1}{2}$ as before. Therefore, similarly proceeding, we would obtain;
+ 		$$\lambda_{R \mid C} = \frac{1 - \sqrt{\theta}}{(1 + \sqrt{\theta})}$$
+ 		
+ 		Combining results obtained from both the cases above, we get;
+ 		$$\lambda_{C\mid R} = \lambda_{R \mid C} = \left| \frac{\sqrt{\theta} - 1}{\sqrt{\theta} + 1} \right| = \vert Y \vert$$
+ 	\end{enumerate}
+ 	
+\end{solution}
+\vskip3pt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{problem}
+\textbf{Minimum and maximum agreement} \hfill [12]\vskip3pt\noindent
+% Problem statement
+\begin{enumerate}
+    \item[(a)] Consider a $2 \times 2$ contingency table. Given the marginals $p_{1\bigcdot}, p_{\bigcdot 1}$, compute the maximum and the minimum values of the agreement $p_{11} + p_{22}$, and hence compute the minimum and the maximum values of Cohen's $\kappa$. What are the minimizing and maximizing configurations?
+
+    \item[(b)] Consider the measure
+        \[
+            \lambda_r = \frac{\sum_{i}p_{ii} - \frac{1}{2}(p_{m\bigcdot} + p_{\bigcdot m})}{1 - \frac{1}{2}(p_{m\bigcdot} + p_{\bigcdot m})},
+        \]
+    where $p_{m\bigcdot} + p_{\bigcdot m} = \max_{i} (p_{i\bigcdot} + p_{\bigcdot i})$. Give a decision-theoretic interpretation of this measure. What are its minimum and maximum values (marginals need not be fixed)?
+
+    \item[(c)] Compute $\kappa$ and $\lambda_r$ for the data in Table~\ref{tab:emr}. Also compute the maximum and minimum values of these indices given the marginals.
+    \begin{table}[!htbp]
+    \centering
+    \pgfplotstableread{
+        Self   Yes     No
+        Yes    4.5   10.6   
+        No    11.2   73.7       
+    }\chisquaredata
+
+    \createcontingencytable{\chisquaredata}{Self}{Total}{Total}
+    
+    \pgfplotstabletypeset[
+      every head row/.style={%
+        before row={\toprule 
+            & \multicolumn{3}{c}{EMR}\\            \cmidrule{2-4}},
+        after row=\midrule},
+      every last row/.style={after row=\bottomrule},
+      columns/Self/.style={string type},
+      columns={Self, Yes, No, {Total}},
+    ]\contingencytable
+    \caption{Self-report vs. electronic medical record (EMR) about receiving a prescription (in percentages).}
+    \label{tab:emr}
+    \end{table}
+    \item[(d)] For an $I \times I$ table, formulate the tasks of finding the extremal values of $\sum_{i}p_{ii}$ when the marginals are fixed as linear programs. Use an LP solver to compute, given the marginals, the extremal values of $\kappa$ and $\lambda_r$ for the \texttt{SexualFun} data in the \textbf{R} package \texttt{vcd}. Compare the actual values of these measures against the extremal values.
+\end{enumerate}
+\end{problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Solution to problem 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{solution*}
+\begin{enumerate}
+	\item[(a)] Given the value of the marginals $p_{\cdot 1}$ and $p_{1\cdot}$, we construct the following contingency table;
+	\begin{table}[H]
+		\centering 
+		\begin{tabular}{cccc}
+			\toprule
+			& $C=1$ & $C=2$ & Total\\
+			\midrule 
+			$R = 1$ & $p_{11}$ & $p_{1\cdot} - p_{11}$ & $p_{1\cdot}$\\
+			$R=2$ & $p_{\cdot 1} - p_{11}$ & $1 + p_{11} - p_{\cdot 1} - p_{1\cdot}$ & $1 - p_{1\cdot}$\\
+			\midrule
+			Total & $p_{\cdot 1}$ & $1 - p_{\cdot 1}$ & $1$\\
+			\bottomrule
+		\end{tabular}	
+	\end{table}
+	Therefore, we have $p_{22} = 1 + p_{11} - p_{\cdot 1} - p_{1\cdot}$. Hence, $p_{11} + p_{22} = 1 + 2p_{11} - p_{\cdot 1} - p_{1\cdot}$. Now, note that;
+	$$\max\left\{0, p_{\cdot 1} +  p_{1\cdot} - 1\right\} \leq p_{11} \leq \min\left\{p_{\cdot 1}, p_{1\cdot}\right\}$$
+	Therefore, we obtain;
+	\begin{itemize}
+		\item Maximum value of $p_{11} + p_{22}$ is $1 + 2\min\left\{p_{\cdot 1}, p_{1\cdot}\right\} - p_{\cdot 1} - p_{1\cdot}$.
+		\item Minimum value of $p_{11} + p_{22}$ is $1 + 2\max\left\{0, p_{\cdot 1} +  p_{1\cdot} - 1\right\} - p_{\cdot 1} - p_{1\cdot}$.
+	\end{itemize}
+	
+	Now, note that the formula for Cohen's Kappa is given by;
+	$$\kappa = \dfrac{p_{11} + p_{22} - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }$$
+	
+	Without loss of generality, assume $p_{\cdot 1} < p_{1\cdot}$. Then, the maximizing configuration would look like;
+	\begin{table}[H]
+		\centering 
+		\begin{tabular}{cccc}
+			\toprule
+			& $C=1$ & $C=2$ & Total\\
+			\midrule 
+			$R = 1$ & $p_{\cdot 1}$ & $p_{1\cdot} - p_{\cdot 1}$ & $p_{1\cdot}$\\
+			$R=2$ & $0$ & $1 - p_{1\cdot}$ & $1 - p_{1\cdot}$\\
+			\midrule
+			Total & $p_{\cdot 1}$ & $1 - p_{\cdot 1}$ & $1$\\
+			\bottomrule
+		\end{tabular}	
+	\end{table}
+	In such table, the value of Cohen's Kappa would be;
+	\begin{align*}
+		\kappa & = \dfrac{p_{\cdot 1} + 1 - p_{1\cdot} - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = 1  - \dfrac{\vert p_{\cdot 1} - p_{1\cdot}\vert }{ 1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }
+	\end{align*}
+	On the other hand, we consider two cases for the minimizing configuration;
+	\begin{enumerate}
+		\item[\textbf{Case 1:}] Suppose, $p_{\cdot 1} +  p_{1\cdot} < 1$. In this case, the minimizing configuration would look like;
+		\begin{table}[H]
+			\centering 
+			\begin{tabular}{cccc}
+				\toprule
+				& $C=1$ & $C=2$ & Total\\
+				\midrule 
+				$R = 1$ & $0$ & $p_{1\cdot}$ & $p_{1\cdot}$\\
+				$R=2$ & $p_{\cdot 1}$ & $1 - p_{1\cdot} - p_{\cdot 1}$ & $1 - p_{1\cdot}$\\
+				\midrule
+				Total & $p_{\cdot 1}$ & $1 - p_{\cdot 1}$ & $1$\\
+				\bottomrule
+			\end{tabular}	
+		\end{table}
+		In such table, the value of Cohen's Kappa would be;
+		\begin{align*}
+		\kappa & = \dfrac{0 + 1 - p_{1\cdot} - p_{\cdot 1} - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = \dfrac{1 - p_{1\cdot} - p_{\cdot 1} - p_{1\cdot}p_{\cdot 1} - (1 - p_{1\cdot})( 1- p_{\cdot 1})}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = \dfrac{1 - p_{1\cdot} - p_{\cdot 1} - p_{1\cdot}p_{\cdot 1} - 1 + p_{1\cdot} + p_{\cdot 1} - p_{1\cdot}p_{\cdot 1}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = \dfrac{- 2p_{1\cdot}p_{\cdot 1} }{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }
+		\end{align*}
+		
+		\item[\textbf{Case 2:}] Suppose, $p_{\cdot 1} +  p_{1\cdot} > 1$. In this case, the minimizing configuration would look like;
+		\begin{table}[H]
+			\centering 
+			\begin{tabular}{cccc}
+				\toprule
+				& $C=1$ & $C=2$ & Total\\
+				\midrule 
+				$R = 1$ & $p_{1\cdot} + p_{\cdot 1} - 1$ & $1 - p_{\cdot 1}$ & $p_{1\cdot}$\\
+				$R=2$ & $1 - p_{1\cdot }$ & $0$ & $1 - p_{1\cdot}$\\
+				\midrule
+				Total & $p_{\cdot 1}$ & $1 - p_{\cdot 1}$ & $1$\\
+				\bottomrule
+			\end{tabular}	
+		\end{table}
+		In such table, the value of Cohen's Kappa would be;
+		\begin{align*}
+		\kappa & = \dfrac{p_{1\cdot} + p_{\cdot 1} - 1 + 0 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = \dfrac{-(1 - p_{1\cdot})(1 - p_{\cdot 1}) - p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = \dfrac{ - 2p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }
+		\end{align*}
+	\end{enumerate}
+	
+	
+	\item[(b)] Consider the following game. There are two friends P and Q, who want to watch a movie in one of the $I$ movie theaters together. However, we consider the following two situations:
+	\begin{enumerate}
+		\item[(i)] They do not know where the other person is going.
+		\item[(ii)] Each of them know where the other person is going.
+	\end{enumerate}
+	Now, consider the following loss function;
+	$$L(x, \hat{x}) = (-1)\textbf{1}_{x = \hat{x}} + \textbf{1}_{x \neq \hat{x}}$$
+	where $\textbf{1}_A$ denotes the indicator function of the event $A$. Note that, the above loss indicates that both person is unhappy if they go to different movie theaters while they both are happy if they go to same theater. 
+	
+	Note that, the expected loss (or risk) in the first situation is given by;
+	\begin{align*}
+		E_{(i)}\left( \text{Loss} \right) & = P\left( \hat{R} \neq \hat{C}\right) - P\left( \hat{R} = \hat{C} \right)\\
+		& = \min_i \left( p_{ii} - p_{i\cdot} - p_{\cdot i} + 1  - p_{ii}\right)\\
+		& = \min_i \left( - p_{i\cdot} - p_{\cdot i} + 1\right)\\
+		& = 1 - p_{m\cdot} - p_{\cdot m}
+	\end{align*}
+	The above implication is true since both persons would try to minimize the expected loss given that the other person is also thinking the similar strategy.
+	
+	On the other hand, the expected loss (or risk) in the second situation is given by;
+	\begin{align*}
+	E_{(ii)}\left( \text{Loss} \right) & = \sum_{i}P\left( \hat{R} \neq \hat{C} \vert \hat{C} = i \text{ or } \hat{R} = i\right) - \sum_{i}P\left( \hat{R} = \hat{C} \vert \hat{C} = i \text{ or } \hat{R} = i \right)\\
+	& = (1 - \sum_{i}p_{ii}) - \sum_{i}p_{ii}\\
+	& = (1 - 2\sum_{i}p_{ii})
+	\end{align*}
+	
+	Therefore, we consider the relative decrease in error due to newly added information;
+	\begin{align*}
+		\text{Relative decrease in Risk } & = \dfrac{E_{(i)}\left( \text{Loss} \right) - E_{(ii)}\left( \text{Loss} \right)}{E_{(i)}\left( \text{Loss} \right)}\\
+		& = \dfrac{\left( 1 - p_{m\cdot} - p_{\cdot m} \right) - \left( 1 - 2\sum_{i}p_{ii} \right)}{\left( 1 - p_{m\cdot} - p_{\cdot m} \right)}\\
+		& = \dfrac{2\sum_{i}p_{ii} - p_{m\cdot} - p_{\cdot m}}{\left( 1 - p_{m\cdot} - p_{\cdot m} \right)}
+	\end{align*}
+	The denominator is then changed accordingly to normalize the above quantity between $(-1)$ and $1$ which produces the measure $\lambda_r$.
+	
+	
+	Observe that, if the marginals are not given then clearly, $\sum_{i}p_{ii} \leq 1$. Therefore, 
+	$$\lambda_r = \frac{\sum_{i}p_{ii} - \frac{1}{2}(p_{m\bigcdot} + p_{\bigcdot m})}{1 - \frac{1}{2}(p_{m\bigcdot} + p_{\bigcdot m})}\leq \frac{1 - \frac{1}{2}(p_{m\bigcdot} + p_{\bigcdot m})}{1 - \frac{1}{2}(p_{m\bigcdot} + p_{\bigcdot m})} = 1$$
+	
+	To see that such maximizing configuration can be achieved, consider the following contingency table of probabilities;
+	
+	\begin{table}[H]
+		\centering 
+		\begin{tabular}{cccc}
+			\toprule
+			 & $C = 1$ & $C = 2$ & Total\\
+			\midrule 
+			$R = 1$ & $0.2$ & $0$ & $0.2$\\
+			$R = 2$ & $0$ & $0.8$ & $0.8$\\
+			Total & $0.2$ & $0.8$ & $1$\\
+			\bottomrule
+		\end{tabular}	
+	\end{table}
+	
+	On the other hand, consider the probability;
+	$$P\left[ R\neq i, C \neq i \right]=1-p_{i\cdot} -p_{\cdot i} + p_{ii} > 0$$
+	
+	From this, we obtain;
+	$$\sum_{i} p_{ii} \geq \max_{i}p_{ii} \geq \max_{i}\left( p_{i\cdot} +p_{\cdot i} -1 \right) = \left( p_{m\cdot} +p_{\cdot m} -1 \right)$$
+	
+	Therefore, we have;
+	\begin{align*}
+		& \sum_{i} p_{ii} \geq \left( p_{m\cdot} +p_{\cdot m} -1 \right)\\
+		\Rightarrow \quad & \sum_{i} p_{ii} - \frac{1}{2}\left( p_{m\cdot} +p_{\cdot m} \right) \geq \frac{1}{2}\left( p_{m\cdot} +p_{\cdot m} \right) -1\\
+		\Rightarrow \quad & \frac{\sum_{i} p_{ii} - \frac{1}{2}\left( p_{m\cdot} +p_{\cdot m} \right)}{1 - \frac{1}{2}\left( p_{m\cdot} +p_{\cdot m} \right)} \geq (-1)\\
+		\Rightarrow \quad & \lambda_r \geq (-1)
+	\end{align*}
+	
+	To see that $(-1)$ can be achieved, consider the following contingency table;
+	\begin{table}[H]
+		\centering 
+		\begin{tabular}{cccc}
+			\toprule
+			& $C = 1$ & $C = 2$ & Total\\
+			\midrule 
+			$R = 1$ & $0$ & $0.5$ & $0.5$\\
+			$R = 2$ & $0.5$ & $0$ & $0.5$\\
+			Total & $0.5$ & $0.5$ & $1$\\
+			\bottomrule
+		\end{tabular}	
+	\end{table}
+	
+	
+	\item[(c)] From the given table, we compute the contingency table comprising the estimated probabilities as follows;
+	\begin{table}[H]
+		\centering 
+		\begin{tabular}{cccc}
+			\toprule
+			Self & Yes & No & Total\\
+			\midrule 
+			Yes & 0.045 & 0.106 & 0.151\\
+			No & 0.112 & 0.737 & 0.849\\
+			Total & 0.157 & 0.843 & 1\\
+			\bottomrule
+		\end{tabular}	
+	\end{table}
+	
+	Therefore, the value of Cohen's Kappa for this table is going to be;
+	\begin{align*}
+		\kappa & = \dfrac{p_{11} + p_{22} - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2}}{1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = \dfrac{0.045 + 0.737 - (0.151\times 0.157) - (0.849\times 0.843)}{1 - (0.151\times 0.157) - (0.849\times 0.843) }\\
+		& = \dfrac{0.782 - 0.739414}{1 - 0.739414}\\
+		& = 0.163424
+	\end{align*}
+	
+	Given the marginals, the maximizing value would be (as indicated in solution to problem 2(a)); 
+	\begin{align*}
+		\kappa_{\max} & = 1  - \dfrac{\vert p_{\cdot 1} - p_{1\cdot}\vert }{ 1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+		& = 1 - \dfrac{\vert 0.151 - 0.157\vert}{1 - (0.151\times 0.157) - (0.849\times 0.843) }\\
+		& = 0.976975
+	\end{align*}
+	
+	Since, here $p_{\cdot 1} + p_{1 \cdot}$ is less than $1$, the minimizing value would be;
+	
+	\begin{align*}
+	\kappa_{\min} & = 1  - \dfrac{-2p_{\cdot 1}p_{1\cdot}}{ 1 - p_{1\cdot}p_{\cdot 1} - p_{2\cdot}p_{\cdot 2} }\\
+	& = 1 - \dfrac{(-2) 0.151 \times 0.157}{1 - (0.151\times 0.157) - (0.849\times 0.843)}\\
+	& = -0.1819514
+	\end{align*}
+	
+	Now, the value of $\lambda_r$ for the given contingency table would be;
+	\begin{align*}
+		\lambda_{r} & = \dfrac{p_{11} + p_{22} - \frac{1}{2}(p_{m\cdot} + p_{\cdot m})}{1 - \frac{1}{2}(p_{m\cdot} + p_{\cdot m})}\\
+		& = \dfrac{0.045 + 0.737 - \frac{1}{2}(0.849 + 0.843)}{1 - \frac{1}{2}(0.849 + 0.843)}\\
+		& = \dfrac{0.782 - 0.846}{1 - 0.846}\\
+		& = -0.4155844
+	\end{align*}
+	
+	Now, from the solution of problem 2(a), we also find that; maximum value of $p_{11} + p_{22}$ would be $1 + (2\times 0.151) - 0.151 - 0.157$, as $\min\left\{ p_{1\cdot}, p_{\cdot 1} \right\} = 0.151$, for the given marginals. Therefore, maximum value of $\lambda_r$ is;
+	
+	\begin{align*}
+	\lambda_{r, \max} & = \dfrac{1 + (2\times 0.151) - 0.151 - 0.157 - \frac{1}{2}(0.849 + 0.843)}{1 - \frac{1}{2}(0.849 + 0.843)}\\
+	& = \dfrac{0.994 - 0.846}{1 - 0.846}\\
+	& = 0.961039
+	\end{align*}
+	
+	and the minimum value of $p_{11} + p_{22}$ would be $(1 - 0.151 - 0.157) = 0.692$. Therefore, the minimum value of $\lambda_r$ given the marginals are going to be;
+	\begin{align*}
+	\lambda_{r, \min} & = \dfrac{0.692 - \frac{1}{2}(0.849 + 0.843)}{1 - \frac{1}{2}(0.849 + 0.843)}\\
+	& = \dfrac{0.692 - 0.846}{1 - 0.846}\\
+	& = -1
+	\end{align*}
+	
+	\item[(d)] The problem of finding extremal values of $\sum_{i}p_{ii}$ can be rewritten as a linear programming problem with $I^2$ many variables of interest as follows;
+	\begin{align*}
+		\max \text{ or } \min & \sum_{i}p_{ii}\\
+		\text{subject to the constraints;} &\\
+		\sum_{j} p_{ij} & = p_{i\cdot} \qquad \forall i = 1, 2, \dots I\\ 
+		\sum_{i} p_{ij} & = p_{\cdot j} \qquad \forall j = 1, 2, \dots I 
+	\end{align*}
+
+	To solve the linear programming, we first load the required packages in \emph{R}.
+	\begin{Shaded}
+			\KeywordTok{library}\NormalTok{(vcd)}\\
+			\KeywordTok{library}\NormalTok{(lpSolve)}			
+	\end{Shaded}
+
+	Now, we load the \emph{SexualFun} data from \textbf{vcd} package.
+	
+	\begin{Shaded}
+			\NormalTok{data \textless- } \StringTok{}\NormalTok{vcd}\OperatorTok{::}\NormalTok{SexualFun}\\
+			\KeywordTok{ftable}\NormalTok{(data)}
+	\end{Shaded}
+	
+	\begin{verbatim}
+	Wife Never Fun Fairly Often Very Often Always fun
+	Husband                                                       
+	Never Fun                 7            7          2          3
+	Fairly Often              2            8          3          7
+	Very Often                1            5          4          9
+	Always fun                2            8          9         14
+	\end{verbatim}
+	
+	We first obtain the actual values of Cohen's Kappa \(\kappa\) and the
+	measure \(\lambda_r\) for the actual table;
+	
+	\begin{Shaded}
+			\NormalTok{kp \textless- }\StringTok{ }\KeywordTok{Kappa}\NormalTok{(data)   }\CommentTok{\#compute the actual Kappa }\\
+			\KeywordTok{print}\NormalTok{(kp)}
+	\end{Shaded}
+	
+	\begin{verbatim}
+	value     ASE     z Pr(>|z|)
+	Unweighted 0.1293 0.06860 1.885 0.059387
+	Weighted   0.2374 0.07832 3.031 0.002437
+	\end{verbatim}
+	
+	We note that the actual value of Cohen's Kappa for \emph{SexualFun} data
+	is \(0.12933025\).
+	
+	Consider the following code which computes \(\lambda_r\);
+	
+	\begin{Shaded}
+			\NormalTok{n \textless- }\StringTok{ }\KeywordTok{sum}\NormalTok{(data)}\\
+			\NormalTok{rowMar \textless- }\StringTok{ }\KeywordTok{rowSums}\NormalTok{(data)}\OperatorTok{/}\NormalTok{n}\\
+			\NormalTok{colMar \textless- }\StringTok{ }\KeywordTok{colSums}\NormalTok{(data)}\OperatorTok{/}\NormalTok{n}\\
+			\NormalTok{a \textless- }\StringTok{ }\KeywordTok{sum}\NormalTok{(}\KeywordTok{diag}\NormalTok{(data))}\OperatorTok{/}\NormalTok{n}\\
+			\NormalTok{b \textless- }\StringTok{ }\KeywordTok{max}\NormalTok{((rowMar }\OperatorTok{+}\StringTok{ }\NormalTok{colMar)}\OperatorTok{/}\DecValTok{2}\NormalTok{)}\\
+			\NormalTok{lambda \textless-}\StringTok{ }\NormalTok{(a }\OperatorTok{-}\StringTok{ }\NormalTok{b)}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{b)}\\
+			\KeywordTok{print}\NormalTok{(lambda)}
+	\end{Shaded}
+	
+	\begin{verbatim}
+	[1] 0
+	\end{verbatim}
+	
+	We find that the actual value of \(\lambda_r\) for \emph{SexualFun} data
+	is \(0\).
+	
+	Now, we consider the minimization and maximization problem, where we try
+	to find extremal values of \(\sum_i p_{ii}\) or correspondingly
+	\(\sum_i n_{ii}\). We shall use \textbf{lpSolve} package to solve the
+	corresponding linear programming for us.
+	
+	\begin{Shaded}
+			\NormalTok{lpMax \textless- }\StringTok{ }\KeywordTok{lp.transport}\NormalTok{(}\DataTypeTok{cost.mat =} \KeywordTok{diag}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{direction =} \StringTok{"max"}\NormalTok{, }
+			\DataTypeTok{row.signs =} \KeywordTok{rep}\NormalTok{(}\StringTok{"=="}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{row.rhs =} \KeywordTok{rowSums}\NormalTok{(data), }
+			\DataTypeTok{col.signs =} \KeywordTok{rep}\NormalTok{(}\StringTok{"=="}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{col.rhs =} \KeywordTok{colSums}\NormalTok{(data))}
+	\end{Shaded}
+	
+	The maximizing configuration would look like;
+	
+	\begin{Shaded}
+			\KeywordTok{print}\NormalTok{(lpMax}\OperatorTok{\$}\NormalTok{solution)}
+	\end{Shaded}
+			
+	\begin{verbatim}
+			[,1] [,2] [,3] [,4]
+			[1,]   12    7    0    0
+			[2,]    0   20    0    0
+			[3,]    0    1   18    0
+			[4,]    0    0    0   33
+	\end{verbatim}
+			
+	Therefore, the maximum value of Cohen's kappa and \(\lambda_r\) is
+	obtained using the following code;
+	
+	\begin{Shaded}
+			\KeywordTok{Kappa}\NormalTok{(lpMax}\OperatorTok{\$}\NormalTok{solution)}
+	\end{Shaded}
+			
+	\begin{verbatim}
+			value     ASE     z   Pr(>|z|)
+			Unweighted 0.8799 0.03969 22.17 6.661e-109
+			Weighted   0.9291 0.02348 39.57  0.000e+00
+	\end{verbatim}
+			
+	\begin{Shaded}
+			\NormalTok{a \textless- }\StringTok{ }\NormalTok{lpMax}\OperatorTok{\$}\NormalTok{objval}\OperatorTok{/}\NormalTok{n}\\
+			\NormalTok{lambda \textless- }\StringTok{ }\NormalTok{(a }\OperatorTok{-}\StringTok{ }\NormalTok{b)}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{b)}\\
+			\KeywordTok{print}\NormalTok{(lambda)}
+	\end{Shaded}
+	
+	\begin{verbatim}
+	[1] 0.862069
+	\end{verbatim}
+	
+	Therefore, the maximum value of Cohen's Kappa given the marginals is
+	\(0.8799\), while the maximum value of \(\lambda_r\) given the marginals
+	is \(0.8621\).
+	
+	We use similar method to find the minimum value of these measures given
+	the marginals.
+	
+	\begin{Shaded}
+			\NormalTok{lpMin \textless- }\StringTok{ }\KeywordTok{lp.transport}\NormalTok{(}\DataTypeTok{cost.mat =} \KeywordTok{diag}\NormalTok{(}\DecValTok{4}\NormalTok{), }\DataTypeTok{direction =} \StringTok{"min"}\NormalTok{, }
+			\DataTypeTok{row.signs =} \KeywordTok{rep}\NormalTok{(}\StringTok{"=="}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{row.rhs =} \KeywordTok{rowSums}\NormalTok{(data), }
+			\DataTypeTok{col.signs =} \KeywordTok{rep}\NormalTok{(}\StringTok{"=="}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{col.rhs =} \KeywordTok{colSums}\NormalTok{(data))}
+	\end{Shaded}
+	
+	The minimizing configuration would look like;
+	
+	\begin{Shaded}
+			\KeywordTok{print}\NormalTok{(lpMin}\OperatorTok{\$}\NormalTok{solution)}
+	\end{Shaded}
+			
+			\begin{verbatim}
+			[,1] [,2] [,3] [,4]
+			[1,]    0    0    0   19
+			[2,]    0    0    6   14
+			[3,]    0   19    0    0
+			[4,]   12    9   12    0
+			\end{verbatim}
+			
+		\begin{Shaded}
+			\KeywordTok{Kappa}\NormalTok{(lpMin}\OperatorTok{\$}\NormalTok{solution)}
+	\end{Shaded}
+	
+	\begin{verbatim}
+	value     ASE      z   Pr(>|z|)
+	Unweighted -0.3661 0.01593 -22.98 7.992e-117
+	Weighted   -0.5607 0.02691 -20.84  1.951e-96
+	\end{verbatim}
+	
+	\begin{Shaded}
+			\NormalTok{a \textless- }\StringTok{ }\NormalTok{lpMin}\OperatorTok{\$}\NormalTok{objval}\OperatorTok{/}\NormalTok{n}\\
+			\NormalTok{lambda \textless- }\StringTok{ }\NormalTok{(a }\OperatorTok{-}\StringTok{ }\NormalTok{b)}\OperatorTok{/}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{b)}\\
+			\KeywordTok{print}\NormalTok{(lambda)}
+	\end{Shaded}
+			
+	\begin{verbatim}
+			[1] -0.5689655
+	\end{verbatim}
+			
+	Therefore, the maximum value of Cohen's Kappa given the marginals is \(-0.3661\), while the maximum value of \(\lambda_r\) given the marginals is \(-0.5689\).
+			
+	
+\end{enumerate}
+\end{solution*}
+
+\section*{Acknowledgments}
+\qquad I sincerely want to extend my thanks to Tamojit Sadhukhan who helped me with some of the solutions.
+
+
+\end{document}
+
+
+
+
+
+

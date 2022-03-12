@@ -1,0 +1,173 @@
+\documentclass[12pt]{article}
+\usepackage[usenames]{color} %used for font color
+\usepackage{amsmath,amssymb,amsthm,amsfonts} %maths
+\usepackage[utf8]{inputenc} %useful to type directly accentuated characters
+\usepackage{hyperref}
+\usepackage[margin=0.3in]{geometry}
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{makecell}
+
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+\newtheoremstyle{problemstyle}  							% <name>
+        {3pt}                                               % <space above>
+        {3pt}                                               % <space below>
+        {\normalfont}                               		% <body font>
+        {}                                                  % <indent amount}
+        {\bfseries}                 						% <theorem head font>
+        {\normalfont\bfseries.}         					% <punctuation after theorem head>
+        {.5em}                                          	% <space after theorem head>
+        {}                                                  % <theorem head spec (can be left empty, meaning `normal')>
+\theoremstyle{problemstyle}
+
+\newtheorem{problem}{}
+\newtheorem{solution}{Solution}
+\newtheorem*{solution*}{Solution}
+
+\newcommand{\createcontingencytable}[4]{ %
+% #1=table name
+% #2=first column name
+% #3=new row sum name
+% #4=new column sum name
+\pgfplotstablecreatecol[
+    create col/assign/.code={% In each row ... 
+        \def\rowsum{0}
+        \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+        % ... loop over all columns, summing up the elements
+        \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+            \pgfmathsetmacro\rowsum{\rowsum+\thisrowno{\col}}
+        }
+        \pgfkeyslet{/pgfplots/table/create col/next content}\rowsum
+    }
+]{#3}{#1}%
+%
+% Transpose the table, so we can repeat the summation step for the columns
+\pgfplotstabletranspose[colnames from={#2},input colnames to={#2}]{\intermediatetable}{#1}
+%
+% Sums for each column
+\pgfplotstablecreatecol[
+    create col/assign/.code={%
+        \def\colsum{0}
+        \pgfmathtruncatemacro\maxcolindex{\pgfplotstablecols-1}
+        \pgfplotsforeachungrouped \col in {1,...,\maxcolindex}{
+            \pgfmathsetmacro\colsum{\colsum+\thisrowno{\col}}
+        }
+        \pgfkeyslet{/pgfplots/table/create col/next content}\colsum
+    }
+]{#4}\intermediatetable
+%
+% Transpose back to the original form
+\pgfplotstabletranspose[colnames from=#2, input colnames to=#2]{\contingencytable}{\intermediatetable}
+}
+%
+
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+\def\ed { \stackrel{d}{=} }
+\def\convd { \stackrel{d}{\rightarrow} }
+\def\corr{\mathrm{corr}}
+\def\normal{\mathcal{N}}
+\def\R{\mathbb{R}}
+\def\Pr{\mathbb{P}}
+\def\M{\mathcal{M}}
+\def\F{\mathcal{F}}
+
+\newcommand{\indep}{\mathrel{\text{\scalebox{1.07}{$\perp\mkern-10mu\perp$}}}}
+
+
+\begin{document}
+
+\begin{center}{\large\textbf{Homework 4} \hfill \large \textit{Categorical Data Analysis, S. S. Mukherjee, Fall 2019}} 
+\end{center}
+\hrule\hrule\vskip3pt
+Topics: Permutation tests, logistic regression   \hfill Due on November 16, 2019\vskip3pt
+\hrule\hrule\vskip3pt\noindent
+Name of student: \\
+Roll number:
+\vskip3pt\noindent	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{problem}
+\textbf{Permutation test of independence} \hfill [8]\vskip3pt\noindent
+% Problem statement
+Perform permutation tests of independence on Table~\ref{tab:genhand} using the $\chi^2$ and the likelihood ratio test statistics. Plot the permutation null distributions of these statistics. Check how the results depend on the number of permutations used. Compare the results with the standard $\chi^2$ and likelihood ratio tests.
+\begin{table}[!htbp]
+\centering
+\pgfplotstableread{
+    Gender Right-handed Left-handed Ambidextrous
+    Male             14           3            3
+    Female           13           1            2
+    Other             6           1            1
+}\chisquaredata
+
+\createcontingencytable{\chisquaredata}{Gender}{Total by Gender}{Total by Handedness}
+
+\pgfplotstabletypeset[
+  every head row/.style={%
+    before row={\toprule 
+        & \multicolumn{3}{c}{Handedness}\\            \cmidrule{2-4}},
+    after row=\midrule},
+  every last row/.style={after row=\bottomrule},
+  columns/Gender/.style={string type},
+  columns={Gender, Right-handed, Left-handed, Ambidextrous, {Total by Gender}},
+]\contingencytable
+\caption{A fictitious dataset.}
+\label{tab:genhand}
+\end{table}
+\end{problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Solution to problem 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{solution*}
+% Write your solution here:
+
+% \end{solution*}
+\vskip3pt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{problem}
+\textbf{Exact logistic regression} \hfill [12]\vskip3pt\noindent
+% Problem statement
+In a standard binomial logistic regression set-up
+\[
+    \mathrm{logit}(\mathbb{P}(Y_i = 1)) = \beta_0 + \beta^\top X_i, \qquad  i = 1, \ldots, n, 
+\]
+write down sufficient statitsics $T_j$ for the parameters $\beta_j$, $j = 0, \ldots, p$. Show that the distribution of $T_p$ conditional on $T_0, \ldots, T_{p - 1}$ depends only on $\beta_p$. Thus, using this conditional distribution, one can estimate and perform inference on $\beta_p$. Does a conditional MLE always exist?
+
+Write down the conditional distribution under $H_0: \beta_p = 0$. Describe how you would do an exact test of this hypothesis. 
+
+Use the \textbf{R} packages \texttt{logistiX} and \texttt{elrm} to perform exact logistic regression on the data in Table~\ref{tab:admit} with ``White-collar job'' as response, and ``Gender'' and ``College education'' as explanatory variables.
+\begin{table}[!htbp]
+    \centering
+    \begin{tabular}{cccc}
+        Gender & College education & White-collar job & Number  of cases \\ \hline
+        M & No & 1 & 8 \\
+        F & No & 1 & 6 \\
+        M & Yes & 7 & 10 \\
+        F & Yes & 6 & 6
+    \end{tabular}
+    \caption{Another fictitious dataset.}
+    \label{tab:admit}
+\end{table}
+Also, perform a standard logistic regression on the same data and compare the results.
+\end{problem}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Solution to problem 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{solution*}
+% Write your solution here.
+
+% \end{solution*}
+\end{document}

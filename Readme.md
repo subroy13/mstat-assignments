@@ -1,0 +1,1 @@
+This repository contains my assignments done during my years in Indian Statistical Insitute, Kolkata as a student of Masters of Statistics (M.Stat.).

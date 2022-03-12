@@ -1,0 +1,236 @@
+---
+title: "Regression Techniques"
+author: "Subhrajyoty Roy (MB-1911)" 
+date: "August 8, 2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "")
+```
+
+# Introduction
+
+Every statistical model is based on some assumptions. When applying this model to fit real world data, it is essential to check whether those assumptions are actually valid for the specific dataset in concern. For Regression model, the method to verify the assumptions is called **Residual Diagnostics**.
+
+The another practical problem that we are often faced with is that there might be many predictor variables which affect the response variable which we are trying to model. However, as we add more and more variables, the model kind of overfits to the specific dataset that we are working with (that is the error for the training dataset becomes smaller) and does not generalize well. Also, the model complexity increases and it becomes cubersome (sometimes impossible) to make a prediction using a model that uses many predictors. In that case, it is essential to figure out a subset of predictors which can explain the change in response variable better, while being reasonably smaller in size in order to make prediction possible. The method to create such subsets of variables is called **Model Selection** or **Variable Selection**.
+
+# Dataset
+
+Here, we are working with *CarSeats* dataset from *ISLR* package. This is a data set containing sales of child car seats at 400 different stores. It contains the following columns.
+
+1. **Sales:** Unit sales (in thousands) at each location
+
+2. **CompPrice:** Price charged by competitor at each location
+
+3. **Income:** Community income level (in thousands of dollars)
+
+4. **Advertising:** Local advertising budget for company at each location (in thousands of dollars)
+
+5. **Population:** Population size in region (in thousands)
+
+6. **Price:** Price company charges for car seats at each site
+
+7. **ShelveLoc:** A factor with levels Bad, Good and Medium indicating the quality of the shelving location for the car seats at each site
+
+8. **Age:** Average age of the local population
+
+9. **Education:** Education level at each location
+
+10. **Urban:** A factor with levels No and Yes to indicate whether the store is in an urban or rural location
+
+11. **US:** A factor with levels No and Yes to indicate whether the store is in the US or not
+
+
+Let us first take a look at the data.
+
+```{r}
+carseats = ISLR::Carseats
+knitr::kable(head(carseats))
+```
+
+
+Since this data contains some factor variables, we remove those variables.
+
+```{r}
+carseats = carseats[, -c(7,10,11)]
+knitr::kable(head(carseats))
+```
+
+Now, we have a dataset with 400 observations and 8 variables. We choose the *Sales* as our response variable which we are trying to predict from the other predictor variables.
+
+```{r}
+summary(carseats)
+```
+
+We also have a missing entry in the observations, which is represented by the *Sales* column taking value 0. Hence, we need to remove that observations.
+
+```{r}
+carseats = subset(carseats, Sales > 0)
+nrow(carseats)
+```
+
+Now, we have 399 observations in our dataset.
+
+
+# Residual Diagnostics
+
+To perform residual diagnostics, firstly, we have to consider a linear regression model with some of the predictors. From economic theory, it is a known fact that demand mostly depends on the price of the commodity, the competitive prices and the average income of the market group. Therefore, we only choose variables *Sales, CompPrice, Income, Price* to work with.
+
+```{r}
+carseats2 = carseats[, c("Sales","CompPrice","Income","Price")]
+knitr::kable(head(carseats2))
+```
+
+Next, we fit a linear model with *Sales* as response variable and the rest as predictors.
+
+```{r}
+model <- lm(Sales ~ Price + CompPrice + Income, data = carseats2)
+summary(model)
+```
+
+We find that multiple R squared is coming out to be 0.3708, suggesting a poor fit of the linear model. Note that, all variables seems to have a significant contribution in the linear model at significance level $\alpha = 0.05$.  
+
+Firstly, we use the box-cox transformation to find out whether a suitable power transformation of the response variable can make it linearly related with the predictor variables.
+
+```{r}
+library(MASS)
+boxcox(model, lambda = seq(0,2, 1/10))
+```
+
+Note that, the appropriate power transformation which yields the most log-Liikelihood is about 0.8. However, since the point $\lambda = 1$ is within the 95% confidence interval range for actual $\lambda$, it seems that power transformation would not greatly benifit us than a multiple linear regression model with no transformation made on response variable.
+
+To check whether the assumptions of linear regression model is valid, we consider the following 4 plots.
+
+```{r fig.width=12, fig.height=12}
+par(mfrow = c(2,2))
+plot(model)
+```
+
+Note that, the residuals vs fitted plot does not show any evident pattern, as expected. The Normal Q-Q plot shows that the sample quantiles of standardized residuals do agree with theoretical standard normal quantiles, however, there is some minor deviations in both tails. The plot of Cook's distance does show one high leverage point which might be influential. 
+
+```{r fig.height=8}
+par(mfrow = c(2,1))
+plot(dffits(model), main = "Dffits values for each observation")
+plot(cooks.distance(model), main = "Cooks Distance for each observation")
+```
+
+We find that there are some observations for which Cooks distance is relatively large, however, there is no obvious influential points.
+
+# Model Selection
+
+We shall use the R package *leaps* for performing Model selection in *carseats* data.
+
+```{r}
+library(leaps)
+```
+
+We first consider all possible models of the available 7 variables (i.e. 127 models) and for each number of predictors, we output the **best** subset with that many predictors in our model, where **best** is determined by maximum $R^2$ or minimum residual sum of squares. For example, if we conisder those models with only two predictors, then we fit all $\binom{7}{2} = 21$ models and report only the one model which has maximum $R^2$. This gives the *best* linear model with 2 predictor variables. Finally, the models containing different number of variables are compared against each other using **Mallow's $C_p$ criterion** or **Adjusted $R^2$**.
+
+Firstly, we use $C_p$ criterion to figure out the best model.
+
+```{r}
+fits = leaps(x = carseats[,2:8], y = carseats[,1], names = names(carseats)[2:8], nbest = 1, method = "Cp")
+
+fits
+```
+
+The best model according to $C_p$ criterion is the model for which $C_p$ value is closest to the number of predictors in the model. From the results above, we find that the best reduced submodel is the one which only 6 predictor variable (including Intercept, $p=6$ and $C_p = 5.167873$), and the corresponding model contains *CompPrice, Income, Advertising, Price* and *Age* as predictors as well as an intercept component.
+
+
+```{r}
+submodel1 = lm(Sales ~ CompPrice + Income + Advertising + Price + Age, data = carseats)
+```
+
+We perform similar treatment with **Adjusted $R^2$**, where the best model is defined by maximum value of adjusted $R^2$.
+
+```{r}
+fits = leaps(x = carseats[,2:8], y = carseats[,1], names = names(carseats)[2:8], nbest = 1, method = "adjr2")
+
+fits
+```
+
+In this case, the *best* model comes out to be the one with 7 predictors (including the intercept). It only leaves out the variable *Population* and use the rest of the variables to model the response variable *Sales*. We, therefore, also consider this reduced submodel.
+
+```{r}
+submodel2 = lm(Sales ~ CompPrice + Income + Advertising + Price + Age + Education, data = carseats)
+```
+
+
+Now, we use Information criterion to find out the best reduced submodel which can explain the variation in response variable *Sales* properly. We compare the two submodel using *AIC, BIC* and *PRESS* criterion.
+
+
+```{r}
+print(paste("The AIC for first submodel is", extractAIC(submodel1)[2]))
+print(paste("The AIC for second submodel is", extractAIC(submodel2)[2]))
+```
+
+We see that, the first submodel has lower AIC than second submodel.
+
+```{r}
+print(paste("The BIC for first submodel is", extractAIC(submodel1, k = log(nrow(carseats)))[2]))
+print(paste("The BIC for second submodel is", extractAIC(submodel2, k = log(nrow(carseats)))[2]))
+```
+
+We also see that, the first submodel has lower BIC than second submodel.
+
+```{r}
+print(paste("The PRESS value for first submodel is", sum((submodel1$residuals/(1-hatvalues(submodel1)))^2) ))
+
+print(paste("The PRESS value for second submodel is", sum((submodel2$residuals/(1-hatvalues(submodel2)))^2) ))
+
+```
+
+Note that, the first submodel also has lower PRESS value than second submodel. Hence, the first submodel should be the *best* reduced model, under any criterion we use.
+
+The summary of first submodel is given as follows;
+
+```{r}
+summary(submodel1)
+```
+
+## Forward and Backward Selection Method
+
+In previous part, *leaps()* function had to check all 127 possible combinations of 7 predictor variables. If the number of predictor variables i.e. $p$ is large, then fitting $2^p-1$ many regression line would be tedious and computationally expensive. 
+
+In such case, one workaround is to add predictor variables sequentially to a base model or remove predictor variables sequentially from the full model. The first method is **Forward Selection Method** and the second method is **Backward Selection Method**.
+
+We first create a Base model and a Full model. To create a base model with a single predictor variable, we choose the one which has highest magnitude of correlation with the response variable.
+
+```{r}
+sapply(carseats, function(x) {abs(cor(x, carseats[,1]))} )
+```
+
+We find that, the variable *Price* has highest correlation with *Sales*. Therefore, our base model will include *Price* variable and an intercept term.
+
+```{r}
+base = lm(Sales ~ Price, data = carseats)
+full = lm(Sales ~ ., data = carseats)
+```
+
+Firstly, we use forward selection method.
+
+```{r}
+step(base, scope = list( upper=full, lower= ~1 ), direction = "forward", trace=FALSE)
+```
+
+We find that the *best* model returned by Forward selection method includes the 5 predictor variables leaving *Population* and *Education*, as the *global best* model returned by exhaustive search. 
+
+Using the backward selection method, we get the same set of predictor variables defining the *best* model as before.
+
+```{r}
+step(full, direction = "backward", trace=FALSE)
+```
+
+# THANK YOU
+
+
+
+
+
+
+
+
+

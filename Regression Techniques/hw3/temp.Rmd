@@ -1,0 +1,176 @@
+---
+title: "Regression Techniques Homework"
+author: "Subhrajyoty Roy (MB1911)"
+date: "27 September 2019"
+output: 
+    prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "", message = FALSE, warning = FALSE)
+```
+
+# Generalized Linear Model
+
+A generalized linear model (GLM) is comprised of three components.
+
+* The response variable is distributed according to a general exponential family of distribution $F$ with mean $\mu = E(Y|X)$.
+
+* A linear function of the predictor variables, namely $\eta = X\beta$, where $\beta$ is the unknown vector of coefficients to be estimated.
+
+* A link function $g(\cdot)$ that links component 1 and component 2. Namely, $g(\mu) = \eta$.
+
+To estimate $\beta$, we can write down the joint likelihood of them given the data $X$ and $Y$, and then use the method of maximum likelihood.
+
+## Datasets
+
+In this assignment, we shall demonstrate the idea of Logistic, Probit and Poisson Regression. For the Logistic and Probit regression model, we require the response variable to be binary in nature, while for the Poisson regression model, we generally need response data as result of some counting processes.
+
+* For the binary response data, we shall consider **NBA Rookie 5 Year Career Longevity Data**, which is available in the link https://data.world/exercises/logistic-regression-exercise-1. The dataset contains the first year player profile of the rookie NBA (Basketball) players, and the goal is to predict whether they would sustain a career longer than 5 years. This study is extremely useful to the owner of the teams in NBA leagues which helps them to extend the contract with basketball players based on their future career aspects.
+
+* The dataset for Poisson regression is from Cameron and Johansson (1997) data used in Count Data Models. The dataset file is named **health.dta**, available in the link http://www.econ.uiuc.edu/~econ508/data.html and http://www.econ.uiuc.edu/~econ508/Stata/e-ta16_Stata.html. This datasets tries to model the number of consultations in the past four week with non-doctor health professionals (chemist, optician, physiotherapist, etc.) based on the patient's age, sex, gender, income level and chronic disease status etc.
+
+
+## Logistic Regression
+
+In the logistic regression model, we have the following:
+
+* The response variable $Y$ conditional on the predictors $X$ follows a binomial distribution, with mean $\mu$.
+
+* The link function is logit function, i.e. $\log\left(\frac{\mu}{1- \mu}\right) = X\beta$.
+
+
+```{r}
+NBAdata <- read.csv('./nba_logreg.csv')
+head(NBAdata)
+```
+
+We remove the name column which is not a potential predictor of the response variable *TARGE_5Yrs*. 
+
+```{r}
+NBAdata <- NBAdata[, -1]
+NBAdata <- NBAdata[complete.cases(NBAdata), ]
+NBAdata$TARGET_5Yrs <- factor(NBAdata$TARGET_5Yrs)
+dim(NBAdata)
+```
+
+We note that the data now contains 1329 many observations on 20 variables. Now, we fit a logistic regression model to the above data.
+
+```{r}
+fit <- glm(TARGET_5Yrs ~ ., data = NBAdata, 
+           family = binomial(link = "logit"))
+summary(fit)
+```
+
+We find that, only a few variables are actually significant, like the number of games played, the minute of play, fields goal success rate, 3 pointers made, number of assists and blocks. Therefore, it is reasonable to refit a logistic regression model only with those varibles which are actually significant.
+
+```{r}
+fit <- glm(TARGET_5Yrs ~ GP + MIN + FG. + X3P.Made + X3PA + AST + BLK, 
+           data = NBAdata, family = binomial(link = "logit"))
+summary(fit)
+```
+
+We see that the residual deviance does not increase much. However, we also note that *AST* is now insignificant. So, we again refit the model without this *AST* variable.
+
+```{r}
+fit <- glm(TARGET_5Yrs ~ GP + MIN + FG. + X3P.Made + X3PA + BLK, 
+           data = NBAdata, family = binomial(link = "logit"))
+summary(fit)
+```
+
+We again see that residual deviance increase very small. Since, all variables are now significant, we stick with this current model. We see that the AIC of the final logistic model is `r AIC(fit)`.
+
+
+## Probit Regression
+
+In the probit regression model, we have the following:
+
+* The response variable $Y$ conditional on the predictors $X$ follows a binomial distribution, with mean $\mu$.
+
+* The link function is probit function, i.e. $\Phi^{-1}(\mu) = X\beta$, where $\Phi(\cdot)$ is the cdf of standard normal distribution.
+
+We fit the probit regression model with all predictors included first.
+
+```{r}
+fit <- glm(TARGET_5Yrs ~ ., data = NBAdata, 
+           family = binomial(link = "probit"))
+summary(fit)
+```
+
+We find that, only a few variables are actually significant, like the number of games played, fields goal success rate, 3 pointers made, number of assists and blocks. Therefore, it is reasonable to refit a probit regression model only with those varibles which are actually significant. Note that, logistic and probit regression although chooses different sets of predictors, the most significant predictors remain same in both cases.
+
+```{r}
+fit <- glm(TARGET_5Yrs ~ GP + FG. + X3P.Made + X3PA + AST + BLK, 
+           data = NBAdata, family = binomial(link = "probit"))
+summary(fit)
+```
+
+We again see that residual deviance does not increase a lot. Since, all variables are now significant, we stick with this current model. Note that, the residual deviance here is slightly larger than the residual deviance for logistic model.We see that the AIC of the final logistic model is `r AIC(fit)`.
+
+Therefore, in terms of AIC, logistic regression performs slightly better than the probit model.
+
+## Poisson Regression
+
+
+In the Poisson regression model, we have the following:
+
+* The response variable $Y$ conditional on the predictors $X$ is assumed to follow a Poisson distribution, with mean $\lambda$.
+
+* The link function is log, i.e. $\log(\lambda) = X\beta$, where $\log$ is the natural logarithm.
+
+First, we load the data into *R*.
+
+```{r}
+library(foreign)
+library(ggplot2)
+healthdata <- read.dta('./health.dta')
+```
+
+Before proceeding with the regression, let us first remove any *NA* values from the data and try plotting a histogram for the response variable.
+
+```{r}
+healthdata <- healthdata[complete.cases(healthdata), ]
+summary(healthdata)
+ggplot(healthdata, aes(NONDOCCO)) + geom_histogram()
+```
+
+The diagram says that most of the counts are actually 0. Let us look at the counts in a logarithmic scale to see a better visualization
+
+```{r}
+ggplot(healthdata, aes(NONDOCCO)) + geom_histogram() + scale_y_log10()
+```
+
+We note that, the above setup clearly seems like a zero inflated situation. Nevertheless, we still fit a Poisson regression just to see how it performs.
+
+```{r}
+healthdata$SEX <- factor(healthdata$SEX)
+healthdata$LEVYPLUS <- factor(healthdata$LEVYPLUS)
+healthdata$FREEPOOR <- factor(healthdata$FREEPOOR)
+healthdata$FREEREPA <- factor(healthdata$FREEREPA)
+healthdata$CHCOND1 <- factor(healthdata$CHCOND1)
+healthdata$CHCOND2 <- factor(healthdata$CHCOND2)
+
+fit <- glm(NONDOCCO ~ ., healthdata, family = "poisson")
+summary(fit)
+```
+
+Note that, most of the variables turned out to be significant other than Income and the presence of Government Insurance Coverage. However, the residual deviance has not been decreasing much compared to the null deviance due to the fitting of this Poisson model.
+
+On the other hand, we could have used a Zero Inflated Poisson model (as clear from the above plot of histogram). 
+
+```{r}
+library(pscl)
+
+fit <- zeroinfl(NONDOCCO ~ ., healthdata)
+summary(fit)
+AIC(fit)
+```
+
+We also see that AIC is much smaller compared to the usual Poisson Regression model. Therefore, a Zero Inflated Poisson model is better to model this data. Also, the variable *Income* now is significant once we remove the zero inflation from the data using logistic modelling. 
+
+
+# THANK YOU

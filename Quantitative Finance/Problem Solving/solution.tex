@@ -1,0 +1,629 @@
+\documentclass[12pt]{article}
+\usepackage[usenames]{xcolor} %used for font color
+\usepackage{amsmath,amssymb,amsthm,amsfonts} %maths
+\usepackage[utf8]{inputenc} %useful to type directly accentuated characters
+\usepackage{hyperref}
+\usepackage[top=1in, bottom = 1in, left = 0.75in, right = 0.75in]{geometry}
+\usepackage{graphicx, cancel}
+\usepackage{tcolorbox}
+\usepackage{listings}
+\usepackage{booktabs}
+\renewcommand{\baselinestretch}{1.33}
+\setlength{\parindent}{0pt}
+
+
+\newtheoremstyle{problemstyle}  							% <name>
+        {3pt}                                               % <space above>
+        {3pt}                                               % <space below>
+        {\normalfont}                               		% <body font>
+        {}                                                  % <indent amount}
+        {\bfseries}                 						% <theorem head font>
+        {\normalfont\bfseries.}         					% <punctuation after theorem head>
+        {.5em}                                          	% <space after theorem head>
+        {}                                                  % <theorem head spec (can be left empty, meaning `normal')>
+\theoremstyle{problemstyle}
+
+\newtheorem{pbm}{Problem}
+\newtheorem{solution}{Solution}
+\newtheorem*{solution*}{Solution}
+
+\newenvironment{problem}{
+\begin{tcolorbox}[colback=green!10!white,colframe=black!75!black, parbox = false]\begin{pbm} }{\end{pbm}\end{tcolorbox} }
+
+
+\makeatletter
+\newcommand*\bigcdot{\mathpalette\bigcdot@{.5}}
+\newcommand*\bigcdot@[2]{\mathbin{\vcenter{\hbox{\scalebox{#2}{$\m@th#1\bullet$}}}}}
+\makeatother
+
+
+% CUSTOM Definitions
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\text{Var}}
+\newcommand{\Cov}{\text{Cov}}
+\newcommand{\normal}{\mathcal{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\ind}[1]{\boldsymbol{1}_{\{ #1 \}}}
+
+
+\begin{document}
+
+% GIVE a cool looking title page
+\begin{titlepage}
+\centering
+\vspace*{5cm}
+\Huge{\textbf{Quantitative Finance Problem Solving Assignment}}\\
+\vspace*{1cm}
+\Large{\textit{As a part of the Master of Statistics (M. Stat.) Second year curriculum}}\\
+\vspace*{2cm}
+\begin{large}
+\begin{tabular}{rr}
+Aabesh Bhattacharyya & (MB1910)\\
+Abhinandan Dalal & (MB1920)\\
+Subhrajyoty Roy & (MB1911)
+\end{tabular}
+\end{large}
+\vspace*{2cm}
+\begin{flushright}
+    January 2021
+\end{flushright}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+%%%%%%%%%%%%%%%%Pliska problems 1-3
+\section{Problems from Pliska: Mathematical Finance}
+
+\subsection{Pilska, Chapter 1, Problem 9}
+% Pilska, Chapter 1, Problem 9
+\begin{problem}
+Suppose $K = 2, N = 1$, and the interest rate is a scalar parameter $r \geq 0$. Also, suppose $S_0 = 1, S_1(\omega_1) = u$ (up), and $S_1(\omega_2) = d$ (down), where the parameters satisfy $u > d > 0$. For what values of $u, d$ and $r$, does there exist a risk neutral probability measure? Say what this measure is. For the complementary values of these
+parameters, say what all the arbitrage opportunities are.  
+\end{problem}
+
+\begin{solution*}
+
+Let, $Q = (q, 1-q)$ be the risk neutral probability with $Q(\omega_1) = q$. By definition of risk-neutrality, 
+\begin{align*}
+    & \E_Q\left[ \Delta S_1^\ast \right] = 0\\
+    \Rightarrow \quad & \E_Q\left[ S_1^\ast \right] = S_0^\ast = S_0\\
+    \Rightarrow \quad & q \left( \dfrac{u}{(1+r)} \right) + (1 - q)\left( \dfrac{d}{(1+r)} \right) = 1, \qquad \text{since, } S_0 = 1\\
+    \Rightarrow \quad & q (u - d) + d = (1 + r)\\
+    \Rightarrow \quad & q = \dfrac{(1 + r - d)}{(u - d)}
+\end{align*}
+We require $0 < q < 1$, to validate $Q$ as a risk neutral probability measure. The inequality, $q > 0$ translates to $d < (1 + r)$ and the inequality $q < 1$ translates to $(1 + r) < u$. Therefore, if the quantities $d, r, u$ satisfy the relationship, $d < (1+r) < u$, only then the risk neutral measure would exist and it would be given by,
+$$
+\left( Q(\omega_1), Q(\omega_2) \right) = \left( \dfrac{(1+r)-d}{u-d}, \dfrac{u - (1+r)}{u-d} \right)
+$$
+If $(1+r) < d$, then consider the following portfolio which buys $1$ unit of the stock funded by $1$ unit of loan from the bank (or by selling the riskless bond). In time $t = 0$, this portfolio has net value equal to $0$, but since the stock price in either of the states of nature is more than the liability to the bank at time $t = 1$ (since $u > d > (1+r)$), the portfolio asserts a guaranteed positive gain at time $t = 1$. This is an arbitrage opportunity.
+
+On the other hand, if $u < (1+r)$, the reverse portfolio is an arbitrage. In this portfolio, one unit of the stock is sold in the market, and the money is invested in the bank (or used to buy the riskless bond), hence no cost is paid at time $t = 0$. However, since the bank return $(1+r)$ is more than the stock price in both the states of nature, it is a guaranteed gain at time $t = 1$. \hfill $\blacksquare$
+
+\end{solution*}
+
+\newpage 
+
+\subsection{Pilska, Chapter 2, Problem 2}
+% Pilska, Chapter 2, Problem 2
+\begin{problem}
+Suppose $u(w) = \log(w)$. Show that the inverse function $I(i) = i^{-1}$, the Lagrange multiplier is $\lambda = v^{-1}$, the optimal attainable wealth is $W = vL^{-1}B_1$, and the optimal objective value is $\ln(v) - \E\left[ \ln(L/B_1) \right]$. Compute these expressions and solve for the optimal trading strategy in the case where $N = 1, K = 2, r = 1/9, S_0 = 5, S_1(\omega_1) = 20/3, S_1(\omega_2) = 40/9$ and $P(\omega_1) = 3/5$.
+\end{problem}
+
+\begin{solution*}
+
+The optimal portfolio problem as a function of the attainable wealth can be formulated as,
+
+$$
+\max \ \E(u(W)) \ \text{subject to } \E_Q\left[ W/B_1 \right] = v
+$$
+
+Introducing a Lagrangian multiplier $\lambda$, the problem reduces to 
+$\max \ \E(u(W)) - W \lambda L/B_1$. Differentiating with respect to $W$ and setting it equal to $0$ yields the first order condition as, $u'(W) = \lambda L / B_1$. 
+
+In view of the given logarithmic utility function $u(w) = \log(w)$, we have $u'(w) = (1/w)$, and hence the inverse function of $u'$ is given by $(u')^{-1}(i) = (1/i) = i^{-1}$. 
+
+In order to obtain the value of the Lagrange multiplier, we put the optimal value of $W$ (as a function of $\lambda$) into the constraint. In other words, from the first order condition, we have $1/W = \lambda L / B_1$, i.e. ,
+\begin{equation}
+W = \dfrac{B_1}{\lambda L}
+\label{eqn:q2-1}
+\end{equation}
+Also, 
+\begin{align*}
+    v &= \E_Q[W/ B_1] = \E_Q\left[ \dfrac{B_1/\lambda L} {B_1} \right] = \dfrac{1}{\lambda} \E_Q\left[ \dfrac 1L \right] = \dfrac{1}{\lambda} \sum_{\omega \in \Omega} \dfrac{P(\omega)}{Q(\omega)}Q(\omega) = \dfrac{1}{\lambda} \sum_{\omega \in \Omega} P(\omega) = \dfrac{1}{\lambda} \implies\lambda &= v^{-1}
+\end{align*}
+
+Putting the value of $\lambda$ back into \eqref{eqn:q2-1}, we have $W = v L^{-1} B_1$. Hence, the optimal objective value is, $\E[u(W)] = \E[\log(W)] = \E[\log(v L^{-1} B_1)] = \ln(v) - \E[\ln(L/B_1)]$.
+%\textcolor{blue}{Please check the following calculations}
+\vspace{0.5cm}\\
+Now, we shall compute the exact values of these expressions under the given values of the parameters.
+
+First, we shall compute the risk neutral probability. Let, $Q = (q, 1-q)$ be the risk neutral probability where $Q(\omega_1) = q$. Then, 
+$$
+5 = S_0 = \E_Q(S_1^\ast) = q \dfrac{20/3}{(1 + 1/9)} + (1 - q) \dfrac{40/9}{(1 + 1/9)}
+\implies q - (1-q) = 0\implies q = 1/2$$ Therefore, $Q = (0.5, 0.5)$ is the risk neutral probability. Therefore, the state price density is given by,
+
+\begin{align*}
+    L(\omega_1) & = \dfrac{Q(\omega_1)}{P(\omega_1)} = \dfrac{1/2}{3/5} = \dfrac{5}{6}, \qquad \text{ and, } \qquad L(\omega_2) = \dfrac{Q(\omega_2)}{P(\omega_2)} = \dfrac{1/2}{1 - (3/5)} = \dfrac{5}{4}\\
+\end{align*}
+
+Putting these values into the expression $W = v L^{-1} B_1$, we obtain that the optimal attainable wealth is given by,
+
+\begin{align*}
+    W(\omega_1) & = v B_1 / L(\omega_1) = v \left( 1 + \dfrac{1}{9}\right) \dfrac{6}{5} =  \dfrac{4v}{3}
+    , \quad \text{ and, } \quad W(\omega_2) = v B_1 / L(\omega_2) = v \left( 1 + \dfrac{1}{9}\right) \dfrac{4}{5} =  \dfrac{8v}{9}\\
+\end{align*}
+
+Finally, to compute the optimal portfolio, let $H = (H_0, H_1)$ be the optimal trading strategy. Then, equating the valuation $V_1$ of $H$ with the attainable optimal wealth $W$, we obtain the following system of linear equations. 
+
+\begin{align*}
+    W(\omega_1) & = \dfrac{10}{9} H_0 + \dfrac{20}{3} H_1 = \dfrac{4}{3}v\\
+    W(\omega_1) & = \dfrac{10}{9} H_0 + \dfrac{40}{9} H_1 = \dfrac{8}{9}v\\
+\end{align*}
+
+where $v = V_0 = H_0 + 5H_1$. Solving above two equations lead to, $H_0 = 0, H_1 = (v/5)$. Therefore, the optimal trading strategy for any choice of $v$ is the one in which all of the funds are invested in the stock. \hfill $\blacksquare$
+
+
+\end{solution*}
+
+\newpage 
+
+% Pilska, Chapter 4, Problem 9
+\begin{problem}
+\textbf{Pilska, Chapter 4, Problem 9: } Consider the binomial stock price model with $T = 4, S_0 = 20, u = 1.2214$, and $d = 0.8187 = u^{-1}$. The interest rate is $r = 3.82\%$. What is the time $0$ price on an American put that has exercise price $e = 18$? Is it optimal to exercise early? If so, when?  
+\end{problem}
+\begin{solution*}
+
+We know, that for a binomial stock price model, the risk neutral probability measure is characterized by single period risk neutral probability of upward movement, say $q$, and it is given by
+
+$$q = \dfrac{1 + r - d}{u - d} = \dfrac{1 + 0.0382 - 0.8187}{1.2214 - 0.8187} = 0.5450$$
+
+Now, to formulate the binomial tree elaborating the stock prices, we notice that as $d = \frac{1}{u}$, we would require the following potential values as tabulated. Also, as for an American put option, we set the payoff function at time $t$ as $Y_t = \{ e - S_t\}^+ = \{18 - S_t\}^+$ and obtain the tabulated values
+
+\begin{center}
+    \begin{tabular}{|c||ccccccccc|} \hline
+         & $S_0u^{-4}$ & $S_0u^{-3}$ & $S_0u^{-2}$ & $S_0u^{-1}$ & $S_0$ & $S_0u$ & $S_0u^2$ & $S_0u^3$ & $S_0u^4$\\ \hline 
+         $S_t$ & 8.9867 & 10.9763 & 13.4065 & 16.3747 & 20.0 & 24.4280 & 29.8364 &
+         36.4421 & 44.5104 \\ \hline 
+         $Y_t$ & 9.0133 & 7.0237 & 4.5935 & 1.6253 & 0 & 0 & 0 & 0 & 0 \\ \hline 
+    \end{tabular}
+\end{center}
+
+Now, at each node of the binomial tree, $V_t$ (following the notations of Pliska) denoting the price of the corresponding European put option at time $t$. We know that by risk neutral valuation principle that $V_t$ at any node of the tree is given by the risk neutral expectation of $V_{(t+1)}/(1+r)$ branching from that node. Now, a buyer of an American put option would never exercise early if $V_t \geq Y_t$ for all $0 \leq t \leq T$ at each node of the tree. To verify this, note that,
+
+\begin{align*}
+    \E_Q\left[ Y_{t+s} / B_{t+s} \mid \mathcal{F}_t \right]
+    & = \E_Q\left[ \dfrac{(e - S_{t+s})^+}{B_{t+s}} \mid \mathcal{F}_t \right]\\
+    & \geq \E_Q\left[ \dfrac{(e - S_{t+s})}{B_{t+s}} \mid \mathcal{F}_t \right]\\
+    & = e \E_Q\left[ \dfrac{1}{B_{t+s}} \mid \mathcal{F}_t \right] - \E_Q\left[\dfrac{S_{t+s}}{B_{t+s}} \mid \mathcal{F}_t \right]\\
+    & = e (1+ r)^{-(t+s)} - \dfrac{S_t}{B_t}, \qquad \text{as } S/B \text{ is a Q-martingale }\\
+    & \geq (e - S_t)/B_t
+\end{align*}
+
+Also, since $(e - S_{t+s})^+ \geq 0$ implies $\E_Q\left[ Y_{t+s} / B_{t+s} \mid \mathcal{F}_t \right] \geq 0$. Therefore, we have that $\E_Q\left[ Y_{t+s} / B_{t+s} \mid \mathcal{F}_t \right] \geq (Y_t / B_t)$, therefore, $Y/B$ is a $Q$-submartingale. Hence, an application of Optional Sampling theorem shows that for any stopping time $\tau$, we have $\E_Q\left[ Y_{\tau_1} / B_{\tau_1} \right] \leq \E_Q\left[ Y_{\tau_2} / B_{\tau_2} \right]$, where $0 \leq \tau_1 \leq \tau_2 \leq T$ are stopping times. Note that, a conditional version of the above inequality implies, $Y_{\tau_1} / B_{\tau_1} = \E_Q\left[ Y_{\tau_1} / B_{\tau_1} \mid \mathcal{F}_{\tau_1} \right] \leq \E_Q\left[ Y_{\tau_2} / B_{\tau_2} \mid \mathcal{F}_{\tau_1} \right]$, which is equivalent to $V_t \geq Y_t$. 
+
+Thus, at all time points $t$, $V_t\geq Y_t$ for any state of nature $\omega$. Hence, it is foolish to exercise the American option before waiting till the end, as one could guarantee more payoff $V_t$ than $Y_t$ at time $t$, for instance, by going around and selling the corresponding European option for $V_t$, or going short on the portfolio that replicates the corresponding European option. Thus, it is never optimal to exercise this put option earlier than the final time point, and thus, by the Law of one price, its price must be equal to the corresponding European option. 
+
+To find the price at time 0 of the corresponding European option, note that, $S_T = S_0u^{2N_T - T}$, and under the risk neutral probability measure, $N_T\sim \text{Bin}(T, q)$. Here, $T = 4$, and thus, $S_T$ can take values $S_0u^{-4}, S_0u^{-2}, \cdots, S_0 u^4$, and thus, the only positive values $Y_T$ takes are $9.0133$ and $4.5935$ as can be seen from the table, and for those values, $N_T = 0$ and $N_T = 1$ respectively, which occur with corresponding probabilities $(1-q)^4$ and $4q(1-q)^3$. 
+
+Thus, the time $0$ price for the European put option is given by 
+
+\begin{align*}
+    P & = \E_Q[Y_T/B_T]\\
+    & = \dfrac{1}{(1+ 0.0382)^4} \left(9.0133\times (1 - 0.5450)^4 + 4.5935\times 4\times 0.5450\times (1 - 0.5450)^3 \right)\\
+    & = 1.14419    
+\end{align*}
+
+
+Hence, the time 0 price of the American put option is 1.14419 monetary units as well. It is never advisable to exercise the option earlier than the final maturity date. \hfill $\blacksquare$
+
+\end{solution*}
+
+\newpage
+
+%%%%%%%%Hoel Port Stone problems 4-9
+
+\section{Problems from Hoel Port Stone: Stochastic Processes}
+
+
+% HPS Chapter 4, Problem 3
+\subsection{Hoel Port Stone, Chapter 4, Problem 3}
+\begin{problem}
+Let $X(t), -\infty < t < \infty$ be a second order stationary process and set $Y(t) = X(t+1) - X(t), -\infty < t < \infty$. Show that the $Y(t)$ process is a second order stationary process having zero means and covariance function
+
+$$
+r_Y(t) = 2r_X(t) - r_X(t-1) - r_X(t+1)
+$$
+\end{problem}
+\begin{solution*}
+Let, $X(t)$ be the second order stationary process with mean $\mu_X$ and covariance function $r_X(t)$. If $Y(t) = X(t) - X(t-1)$, then, $Y(t)$, being the difference of two square integrable random variables, is square integrable as well. Thus, $Y(t)$ is a second order process. Now, 
+\begin{align*}
+    \mu_Y(t) 
+    & = \E(Y(t))\\
+    & = \E(X(t) - X(t-1))\\
+    & = \E(X(t)) - \E(X(t-1))\\
+    & = \mu_X - \mu_X \qquad \text{by stationarity}\\
+    & = 0
+\end{align*}
+\noindent and,
+\begin{align*}
+    r_Y(s+t, s)
+    & = \Cov(Y(s+t), Y(s))\\
+    & = \Cov(X(s+t) - X(s+t-1), X(s) - X(s-1))\\
+    & = \Cov(X(s+t), X(s)) - \Cov(X(s+t), X(s-1)) - \Cov(X(s+t-1), X(s))\\
+    & \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad + \Cov(X(s+t-1), X(s-1))\\
+    & = r_X((s+t) - s) - r_X((s+t) - (s-1)) - r_X((s+t-1) - s)\\
+    & \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad \qquad + r_X((s+t-1) - (s-1))\\
+    & = r_X(t) - r_X(t+1) - r_X(t-1) + r_X(t)\\
+    & = 2 r_X(t) - r_X(t+1) - r_X(t-1)
+\end{align*}
+
+\noindent Since the mean process is constant independent of the time $t$, and the covariance process depends only on the time lag $t = ((t+s) - s)$, the difference process $Y(t) = X(t) - X(t-1)$ is also a second order stationary process with zero mean and $r_Y(t) = r_Y(s+t, s)$ as the covariance function. \hfill $\blacksquare$
+
+\end{solution*}
+
+\newpage
+
+% HPS Chapter 4, Problem 11
+
+\subsection{Hoel Port Stone, Chapter 4, Problem 11}
+\begin{problem}
+Let, $R_1, \dots R_n$, and $\Theta_1, \dots \Theta_n$ be independent random variables such that $\Theta$'s are uniformly distributed on $[0,2\pi)$ and $R_k$ has the density 
+
+$$
+f_{R_k}(r) = \begin{cases}
+    \dfrac{r}{\sigma_k^2} e^{-r^2/2\sigma_k^2}, & 0 < r < \infty\\
+    0, & r \leq 0\\
+\end{cases}
+$$
+\noindent where $\sigma_1, \dots \sigma_n$ are positive constants. Let, $\lambda_1, \dots \lambda_n$ be positive constants and set 
+
+$$
+X(t) = \sum_{k=1}^n R_k \cos(\lambda_k t + \Theta_k)
+$$
+
+\noindent Show that $X(t)$ is a Gaussian process.
+\end{problem}
+\begin{solution*}
+    First, we shall prove the following fact:
+    
+    \textbf{Fact:} If $R\sim f_R(r) = \frac{r}{\sigma^2}\exp\left(-\frac{r^2}{\sigma^2}\right)\mathbf{1}(r>0)$, and $\Theta\sim U[0, 0+ 2\pi)$, then $R\cos\theta$ and $R\sin\theta$ are independent $\mathcal{N}(0,\sigma^2)$ random variables.
+    
+    \textbf{Proof}: Let $A = R\cos\Theta$ and $B= R\sin\Theta$. Since, $\partial{A}/{\partial R}$ and $\partial{A}/\partial \Theta$ are easy to compute, $R = \sqrt{A^2 + B^2}$, $\theta = \arctan \frac{B}{A}$ and the Jacobian for one side of the transformation is inverse of the inverse transformation, hence, the Jacobian $J$ for the transformation is given by $$\dfrac 1J = \begin{vmatrix} \dfrac{\partial A}{\partial R} & \dfrac{\partial B}{\partial R} \\ \\
+    \dfrac{\partial A}{\partial \theta} & \dfrac{\partial B}{\partial \theta} 
+    \end{vmatrix} = \begin{vmatrix} \cos\Theta & \sin\Theta \\ -R\sin\Theta & R\cos\Theta \end{vmatrix} = R = \sqrt{A^2 + B^2} \implies J = \dfrac{1}{\sqrt{a^2 + b^2}}
+    $$
+    and thus, 
+    $$f_{R,\Theta} = \dfrac{r}{2\pi\sigma^2}\exp\left(-\frac{r^2}{2\sigma^2}\right)\mathbf{1}(R>0,\theta\in [0,2\pi)$$ yields
+    \begin{align*}
+        f_{A,B}(a,b) &= \dfrac{\cancel{\sqrt{a^2 + b^2}}}{2\pi\sigma^2}\exp\left(-\dfrac{a^2 + b^2}{2\sigma^2}\right)\times \dfrac{1}{\cancel{\sqrt{a^2 + b^2}}} \\ &= \left[-\dfrac{1}{\sigma\sqrt{2\pi}}\exp\left(-\dfrac{a^2}{2\sigma^2}\right)\right]\left[-\dfrac{1}{\sigma\sqrt{2\pi}}\exp\left(-\dfrac{b^2}{2\sigma^2}\right)\right]
+    \end{align*}
+    concluding the proof of the fact.
+    \vspace{0.5cm}\\
+    Returning to the problem at hand, consider any $t_1<t_2<\cdots<t_m$ and $a_1,\cdots,a_m\in \R$ to form the linear combination of $X(t_j)$'s, ie., 
+    \begin{align*}
+        \sum_{j=1}^m a_jX(t_j) & = \sum_{j = 1}^m a_j\sum_{k=1}^n R_k \cos(\lambda_kt_j + \Theta_k) \\
+        &= \sum_{j=1}^m\sum_{k=1}^n a_jR_k(\cos(\lambda_kt_j)\cos\Theta_k -\sin(\lambda_kt_j)\sin\Theta_k)\\
+        &= \sum_{j = 1}^m\sum_{k = 1}^n a_j\cos(\lambda_kt_j)R_k\cos\Theta_k - \sum_{j = 1}^m\sum_{k = 1}^n a_j\sin(\lambda_kt_j)R_k\sin\Theta_k
+    \end{align*}
+    As $R_k$'s and $\Theta_k$'s are independent, and $R_k\cos\Theta_k$ and $R_k\sin\Theta_k$ are independent normal random variables by our fact, hence, $\sum_{j=1}^m a_jX(t_j)$, by the above representation, can be written as a sum of independent normal random variables, and is hence normally distributed (with mean $0$ and variance $\sum_{j = 1}^m\sum_{k=1}^n a_j^2\sigma_k^2$ by the above representation and our fact). Thus, $X(t)$ is a Gaussian process. \hfill $\blacksquare$
+    
+    
+    
+    
+    
+    
+\end{solution*}
+
+\newpage
+
+% HPS Chapter 4, Problem 19
+
+
+\subsection{Hoel Port Stone, Chapter 4, Problem 19}
+\begin{problem}
+Let $W(t)$ denotes the Weiner process. Define, 
+
+$$
+X(t) = e^{-\alpha t} W(e^{2\alpha t}), \qquad -\infty < t < \infty
+$$
+
+\noindent where $\alpha$ is a positive constant. Show that $X(t)$ process is a stationary Gaussian process having the covariance function 
+
+$$
+r_X(t) = \sigma^2 e^{-\alpha \vert t \vert}, \qquad -\infty < t < \infty
+$$
+
+\end{problem}
+\begin{solution*}
+
+Firstly note that, the mean function of $X(t)$ is,
+\begin{align*}
+    \mu_X(t)
+    & = \E(X(t)) \\
+    & = e^{-\alpha t} \E(W(e^{2\alpha t}))\\
+    & = e^{-\alpha t} \E(W(e^{2\alpha t}) - W(0)), \qquad \text{since, } W(0) = 0\\
+    & = 0 \qquad \text{since, } W(e^{2\alpha t}) - W(0) \sim \normal\left(0, \sigma^2 e^{2\alpha t}\right)
+\end{align*}
+
+which is a constant. Also, $\E[X(t)^2] = e^{-2\alpha t}\E(W^2(e^{2\alpha t})) = e^{-2\alpha t}\sigma^2e^{2\alpha t} = \sigma^2<\infty$ and thus $X(t)$ is indeed a second order process. Turning our attention to the covariance function, we have for $t \geq 0$, 
+\begin{align*}
+    r_X(s+t, s)
+    & = \Cov(X(s+t), X(s))\\
+    & = \Cov\left( e^{-\alpha (s+t)} W(e^{2\alpha (s+t)}), e^{-\alpha s} W(e^{2\alpha s)}) \right)\\
+    & = e^{-\alpha(2s + t)} \Cov(W(e^{2\alpha (s+t)}), W(e^{2\alpha s}))\\
+    & = e^{-\alpha(2s + t)} \Cov(W(e^{2\alpha (s+t)}) - W(e^{2\alpha s}) + W(e^{2\alpha s}), W(e^{2\alpha s}))\\
+    & = e^{-\alpha(2s + t)} \Var(W(e^{2\alpha s}))
+\end{align*}
+\noindent since, $W(e^{2\alpha (s+t)}) - W(e^{2\alpha s})$ is independent of $W(e^{2\alpha s})$ as $\alpha > 0$. Noticing that $\Var(W(e^{2\alpha s})) = \sigma^2 e^{2\alpha s}$, we obtain that 
+$$
+r_X(s+t, s) = e^{-\alpha(2s + t)} \times \sigma^2 e^{2\alpha s} = \sigma^2 e^{-\alpha t}, \qquad t \geq 0
+$$
+On the other hand, for $t < 0$, $\Cov(W(e^{2\alpha (s+t)}), W(e^{2\alpha s})) = \Var(W(e^{2\alpha (s+t)}) ) = \sigma^2 e^{2\alpha (s + t)}$, since then $W(e^{2\alpha (s+t)})$ would be independent of $W(e^{2\alpha s}) - W(e^{2\alpha (s+t)})$. Hence, 
+$$
+r_X(s+t, s) = e^{-\alpha(2s + t)} \times \sigma^2 e^{2\alpha (s+t)} = \sigma^2 e^{\alpha t}, \qquad t < 0
+$$
+\noindent Combining, we obtain that
+$$
+r_X(s+t, s) = \sigma^2 e^{-\alpha \vert t\vert}, \qquad t \in \R
+$$
+\noindent which is independent of $s$ and only depends on the time lag $t$. Thus, $X(t)$ is indeed a stationary second order process. 
+
+Finally, we need to show that $X(t)$ is a Gaussian process. Suppose not. Then, there exists $-\infty<t_1<\cdots<t_m<\infty$ and $a_1,\cdots,a_m\in\R$ such that $$\sum_{j=1}^m a_j X(t_j) = \sum_{j = 1}^m a_je^{-\alpha t_j}W(e^{2\alpha t_j})$$ is not normally distributed. Define, $v_j := e^{2\alpha t_j}\Longleftrightarrow \alpha t_j = \ln \frac{v_j}{2}$ Then, 
+$$\sum_{j = 1}^m a_je^{-\alpha t_j}W(e^{2\alpha t_j}) = \sum_{j = 1}^m \dfrac{2a_j}{v_j} W(v_j) $$ is normally distributed, and since none of $v_j$'s are equal to 0, we have obtained a linear combination of $W(v_1),\cdots, W(v_j)$ which is not normally distributed, contradicting our assumption that $W$ is a Weiner process. Thus, it must be the case that $X(t)$ is a Gaussian process. 
+
+Hence, $X(t)$ is a second order stationary Gaussian process, and our proof is complete. \hfill $\blacksquare$
+
+\end{solution*}
+
+\newpage
+
+
+
+% HPS Chapter 5, Problem 2
+
+
+
+\subsection{Hoel Port Stone, Chapter 5, Problem 2}
+\begin{problem}
+Find the correlation between $W(t)$ and 
+$$\int_0^1 W(s) ds$$ 
+\noindent for $0 \leq t \leq 1$.
+\end{problem}
+\begin{solution*}
+
+Firstly, $\Var(W(t)) = \Var((W(t) - W(0)) + W(0)) = t \sigma^2$, since $W(t) - W(0) \sim \normal(0, \sigma^2 t)$.
+
+Also, 
+\begin{align*}
+    \Var\left[ \int_0^1 W(s) ds \right]
+    & = \int_0^1 \int_0^1 \Cov(W(s), W(t)) ds dt\\
+    & = \int_0^1 \left[ \int_0^t \Cov(W(s), W(t)) ds + \int_t^1 \Cov(W(s), W(t)) ds \right] dt  \\
+    & = \int_0^1 \left[ \int_0^t \sigma^2 s ds + \int_t^1 \sigma^2 t  ds \right] dt\\
+    & = \sigma^2 \int_0^1 \left[ \dfrac{t^2}{2} + t(1-t) \right]dt\\
+    & = \sigma^2 \int_0^1 \left[ t - \dfrac{t^2}{2} \right]dt\\
+    & = \sigma^2 \left( \dfrac{1}{2} - \dfrac{1}{6} \right) = \sigma^2/3
+\end{align*}
+Turning to the covariance,
+\allowdisplaybreaks
+\begin{align*}
+    \Cov\left[ W(t), \int_0^1 W(s) ds \right]
+    & = \Cov\left[ \int_0^1 \ind{s = t}W(s)ds, \int_0^1 W(s) ds \right]\\
+    &= \int_0^1 \ind{u = t} \int_0^1 \Cov(W(u), W(s)) ds du\\
+    & = \int_0^1 \ind{u = t} \left[ \int_0^u \Cov(W(u), W(s)) ds + \int_u^1 \Cov(W(u), W(s))ds \right] du\\
+    & = \int_0^1 \ind{u = t} \left[ \int_0^u \sigma^2 s ds + \int_u^1 \sigma^2 u ds \right] du\\
+    & = \sigma^2 \int_0^1 \ind{u = t} \left[ \int_0^u s ds + \int_u^1 u ds \right]du
+     = \sigma^2 \int_0^1 \ind{u = t} \left[ \dfrac{u^2}{2} + u(1-u) \right]du\\
+    & = \sigma^2 \int_0^1 \ind{u = t} \left[ u - \dfrac{u^2}{2} \right] du
+    = \sigma^2 \left( t - \dfrac{t^2}{2} \right)
+\end{align*}
+$$
+\boxed{\therefore \text{Cor}\left( W(t), \int_0^1 W(s)ds \right) = \dfrac{t - t^2/2}{\sqrt{t} \sqrt{1/3}} = \dfrac{\sqrt{3}}{2} \dfrac{(2t - t^2)}{\sqrt{t}}}
+$$ 
+\hfill $\blacksquare$
+\end{solution*}
+
+\newpage 
+
+% HPS Chapter 5, Problem 15
+
+
+\subsection{Hoel Port Stone, Chapter 5, Problem 15}
+\begin{problem}
+Find the mean and the variance of 
+$$
+X = \int_0^1 t dW(t) \qquad \text{ and } \qquad Y = \int_0^1 t^2 dW(t)
+$$
+\noindent and find the correlation between these two random variables.
+\end{problem}
+\begin{solution*}
+
+The properties of stochastic integral implies that, $\E(X) = \E(Y) = 0$.
+
+An application of Ito isometry yields, 
+
+$$
+\Var(X) = \Var\left[ \int_0^1 t dW(t) \right] = \E\left[ \left(\int_0^1 t dW(t)\right)^2 \right] = \sigma^2 \int_0^1 t^2 dt = \dfrac{\sigma^2}{3}
+$$
+
+\noindent and
+
+$$
+\Var(Y) = \Var\left[ \int_0^1 t^2 dW(t) \right] = \E\left[ \left(\int_0^1 t^2 dW(t)\right)^2 \right] = \sigma^2 \int_0^1 t^4 dt = \dfrac{\sigma^2}{5}
+$$
+
+\noindent Finally, the covariance property of the stochastic integral implies that,
+
+$$\Cov(X, Y) = \Cov\left[ \int_0^1 t dW(t), \int_0^1 t^2 dW(t) \right] = \sigma^2 \int_0^1 t^3 dt = \dfrac{\sigma^4}{4}$$
+
+Hence, we finally obtain $$\boxed{\text{Cor}(X, Y) = \dfrac{1/4}{\sqrt{1/3}\sqrt{1/5}} = \dfrac{\sqrt{15}}{4}}$$ \hfill $\blacksquare$
+
+
+
+\end{solution*}
+
+\newpage 
+
+% HPS Chapter 6, Problem 7
+
+\subsection{Hoel Port Stone, Chapter 6, Problem 7}
+\begin{problem}
+Show that the left side of the stochastic differential equation 
+
+$$
+a_0 X''(t) + a_1 X'(t) + a_2 X(t) = W'(t)
+$$
+
+\noindent is stable if and only if the coefficients $a_0, a_1$ and $a_2$ are either all positive or all negative.
+\end{problem}
+\begin{solution*}
+The left side of the above stochastic differential equation is stable if and only if the roots of the characteristic polynomial all have negative real parts. In this case, the characteristic polynomial is $a_0r^2 + a_1r + 1 := P(r)$ (say).
+
+The roots of this quadratic polynomial are given by $\dfrac{-a_1 \pm \sqrt{a_1^2- 4a_0a_2}}{2a_0}$. 
+\vspace{0.4cm}\\
+\textbf{Case I}: $D = \sqrt{a_1^2- 4a_0a_2} < 0$
+
+In this case the two roots are $r_1 = \dfrac{-a_1 +i \sqrt{4a_0a_2 - a_1^2}}{2a_0}$ and $r_2 = \dfrac{-a_1 - i \sqrt{4a_0a_2 - a_1^2}}{2a_0}$. The roots have negative real parts iff $$\frac{-a_1}{2a_0} < 0 \iff \frac{a_1}{a_0} > 0 \iff a_1,a_0 \text{ have the same sign}$$  Also from the fact that if a quadratic has roots $z$ and $\bar{z}$, then the product of roots is $z\bar{z} = |z|^2 > 0$, we get that $$\frac{a_2}{a_0} > 0 \iff a_0,a_2 \text{ are of the same sign}$$ Combining, we get that that the roots have negative real parts iff $a_0,a_1,a_2$ all have the same sign i.e. they are either all positive or all negative.
+\vspace{0.5cm}\\
+\textbf{Case II}: $D = \sqrt{a_1^2- 4a_0a_2} \geq 0$
+
+In this case the roots are both real numbers. The real parts of the roots are negative iff both the roots (say $r_1$ and $r_2$) are negative. The roots are negative iff the sum of roots is negative and the product of roots is positive i.e. 
+\begin{align*} 
+r_1r_2 >0 , r_1+r_2 < 0 &\iff -\frac{a_1}{a_0} < 0, \frac{a_2}{a_0} >0 \\ &\iff \frac{a_1}{a_0} > 0 , \frac{a_2}{a_0} >0 \iff a_1,a_2,a_3\text{ have the same sign } 
+\end{align*}
+Therefore, the left side of the stochastic differential equation is stable if and only if $a_0,a_1,a_2$ are either all positive or all negative.
+\hfill $\blacksquare$
+\end{solution*}
+
+
+
+\newpage 
+
+%%%%Oksendal problems 10-11
+
+\section{Problems from Oksendal: Introduction to Stochastic Differential Equations}
+
+% Oksendal B Chapter 3, Problem 6
+\subsection{Oksendal B, Chapter 3, Problem 6}
+\begin{problem}
+Prove that $N_t = B_t^3 - 3 t B_t$ is a martingale, where $B_t$ denotes a Brownian motion.
+\end{problem}
+\begin{solution*}
+Let, $\mathcal{F}_s = \sigma\left( \{ B_u : 0 \leq u \leq s \} \right)$ be the canonical sigma-field associated with the Brownian Motion. Since, $B_t$ is $\mathcal{F}_t$-adapted and $N_t = B_t^3 - 3 t B_t$, is a measurable function of $B_t$, the process $N_t$ is also $\mathcal{F}_t$-adapted. To show that $(N_t, \mathcal{F}_t)$ is a martingale, note that $B_t$ has a normal distribution, and its moments of all orders exist. Thus, $N_t$ is $L_1$ measurable as well. Also  for any $s < t$, 
+\begin{align*}
+    \E(N_t \mid \mathcal{F}_s)
+    & = \E(B_t^3 - 3 t B_t \mid \mathcal{F}_s)\\
+    & = \E(B_t^3 \mid \mathcal{F}_s) - 3 t \E(B_t \mid \mathcal{F}_s)\\
+    & = \E((B_t - B_s + B_s)^3 \mid \mathcal{F}_s) - 3 t \E((B_t - B_s) + B_s \mid \mathcal{F}_s)\\
+    & = \E((B_t - B_s + B_s)^3 \mid \mathcal{F}_s) - 3 t \E((B_t - B_s) \mid \mathcal{F}_s) + 3t \E(B_s \mid \mathcal{F}_s)\\
+    & = \E((B_t - B_s + B_s)^3 \mid \mathcal{F}_s) - 3 t \E(B_t - B_s) + 3t B_s\\
+    & = \E((B_t - B_s + B_s)^3 \mid \mathcal{F}_s) + 3t B_s
+\end{align*}
+\noindent since, $B_s$ is $\mathcal{F}_s$-measurable and $(B_t - B_s)$ is independent of $\mathcal{F}_s$ and has unconditional mean equal to zero.
+
+The first term can be expressed as 
+\begin{align*}
+    & \E((B_t - B_s + B_s)^3 \mid \mathcal{F}_s)\\
+    = \quad & \E((B_t - B_s)^3 \mid \mathcal{F}_s) + 3\E((B_t - B_s)^2 B_s \mid \mathcal{F}_s) + 3 \E((B_t - B_s) B_s^2 \mid \mathcal{F}_s) + \E(B_s^3 \mid \mathcal{F}_s)\\
+    = \quad & \E((B_t - B_s)^3) + 3 B_s \E((B_t - B_s)^2) + 3B_s^2 \E(B_t - B_s) + B_s^3\\
+    = \quad & 3 B_s(t-s) + B_s^3
+\end{align*}
+
+\noindent since, $(B_t - B_s) \sim \normal(0, (t-s))$, which has all order order moment equal to zero. Therefore,
+$$
+\E(N_t \mid \mathcal{F}_s) = 3B_s(t-s) + B_s^3 + 3 t B_s = B_s^3 - 3s B_s = N_s
+$$
+
+Hence, $N_t$ is a martigale with respect to the canonical sigma field $\mathcal{F}_t$. \hfill $\blacksquare$
+
+\end{solution*}
+
+\newpage 
+
+% Oksendal B Chapter 4, Problem 4
+\subsection{Oksendal B, Chapter 4, Problem 4}
+\begin{problem}
+Consider the vector $\theta(t, \omega) = (\theta_1(t, \omega), \dots \theta_n(t, \omega)) \in \R^n$ with $\theta_k(t, \omega) \in \mathcal{V}[0, T]$ for $k = 1, 2, \dots n$, where $T \leq \infty$. Define,
+
+$$
+Z_t = \exp\left\{ \int_0^t \theta(s, \omega) dB(s) - \dfrac{1}{2} \int_0^t \theta^2(s, \omega) ds \right\}, \qquad 0 \leq t \leq T
+$$
+
+\noindent where $B(s) \in \R^n$ and $\theta^2 = \theta \cdot \theta$ (dot product). 
+\begin{enumerate}
+    \item[(a)] Use It\^o's formula to prove that 
+    $$
+    dZ_t = Z_t \theta(t, \omega) dB(t)
+    $$
+    \item[(b)] Deduce that $Z_t$ is a martingale for $t \leq T$, provided that $Z_t \theta_k(t, \omega) \in \mathcal{V}[0, T]$ for $1 \leq k \leq n$.
+\end{enumerate}
+
+\end{problem}
+\begin{solution*}
+
+\begin{enumerate}
+    \item[(a)] Let, $X(t) = (X_{1t}, X_{2t}, \dots X_{nt})$ be an $n$-dimensional Ito process defined as,
+
+$$
+X_{it} = \int_0^t \theta_i(s, \omega) dB_i(s) - \dfrac{1}{2} \theta_i^2(s, \omega) ds, \quad 0 \leq t \leq T; \ i = 1, 2, \dots n
+$$
+
+i.e. $dX_{it} = -(1/2) \theta_i^2(t, \omega)dt + \theta_i(t, \omega) dB_{it}$. Note that, $Z_t = \exp\left[ \sum_{i=1}^n X_{it} \right]$, therefore, to obtain expression for $Z_t$, we apply It\^o's formula on $X(t)$ with the function $g(t, x) = \exp\{ \sum_{i=1}^n x_i \}$. Hence,
+
+\begin{align*}
+    dZ_t
+    & = \dfrac{\partial g}{\partial t}(t, X)dt + \sum_{i=1}^n \dfrac{\partial g}{\partial x_i}(t, X) dX_{it} + \dfrac{1}{2}\sum_{i=1}^n\sum_{j=1}^n \dfrac{\partial^2 g}{\partial x_i \partial x_j}(t, X) dX_{it} dX_{jt}\\
+    & = 0 + \sum_{i=1}^n \exp\left( \sum_{k=1}^n X_{kt} \right) dX_{it} + \dfrac{1}{2}\sum_{i=1}^n\sum_{j=1}^n \exp\left( \sum_{k=1}^n X_{kt} \right) dX_{it} dX_{jt}\\
+    & = \sum_{i=1}^n Z_t \left( -(1/2) \theta_i^2(t, \omega)dt + \theta_i(t, \omega) dB_{it} \right) + \dfrac{1}{2} \sum_{i=1}^n Z_t \theta_i^2(t, \omega)dt\\
+    & = Z_t \sum_{i=1}^n \theta_i(t, \omega) dB_{it}\\
+    & = Z_t \theta(t, \omega) dB(t)
+\end{align*}
+
+
+\item[(b)] Note that, $dZ_t = Z_t \theta(t, \omega) dB(t)$, implies that, 
+
+$$
+Z_t = Z_0 + \int_0^t Z_s \theta(s, \omega) dB(s), \qquad \forall 0 \leq t \leq T
+$$
+
+First note that, by definition, $Z_0 = e^0 = 1$. Also, note that, $Z_t$ is integrable as, $\E(Z_t^2) < \infty$ since, $\E\left[ \left(\int_0^t Z_s \theta(s, \omega) dB(s)\right)^2 \right] < \infty$. This follows from the given condition that $Z_t \theta_k(t, \omega) \in \mathcal{V}[0, T]$ for $1 \leq k \leq n$ and by Cauchy Schwartz inequality,
+
+\begin{multline*}
+\E\left[ \left(\int_0^t Z_s \theta(s, \omega) dB(\omega)\right)^2 \right] = \E\left[ \left(\sum_{k=1}^n \int_0^t Z_s \theta_k(s, \omega) dB_{ks}\right)^2 \right] \\
+\leq n^2 \sup_{1 \leq k \leq n} \E\left[ \left(\int_0^t Z_s \theta_k(s, \omega) dB_{ks}\right)^2 \right] < \infty
+\end{multline*}
+
+
+Next, denoting $\mathcal{F}_t$ as the usual canonical filtration, we have that for any $0 \leq t \leq (t+u) \leq T$,
+
+\begin{align*}
+    \E(Z_{t+u} \mid \mathcal{F}_t)
+    & = \E\left( 1 + \int_0^{(t+u)} Z_s \theta(s, \omega) dB(s) \mid \mathcal{F}_t \right)\\
+    & = 1 + \E\left( \int_0^{t} Z_s \theta(s, \omega) dB(s) \mid \mathcal{F}_t \right) + \E\left( \int_t^{(t+u)} Z_s \theta(s, \omega) dB(s) \mid \mathcal{F}_t \right)\\
+    & = 1 + \int_0^{t} Z_s \theta(s, \omega) dB(s) + \E\left( \int_t^{(t+u)} Z_s \theta(s, \omega) dB(s) \right)\\
+    & = Z_t + \sum_{k=1}^n \E\left( \int_t^{(t+u)} Z_s \theta_k(s, \omega) dB_{ks} \right)\\
+    & = Z_t
+\end{align*}
+
+\noindent where the last equality follows from the fact that $Z_t \theta_k(t, \omega) \in \mathcal{V}[0, T]$, hence the integral $\int_t^{(t+u)} Z_s \theta_k(s, \omega) dB_{ks}$ is a valid It\^o integral, hence its expectation is equal to 0.
+
+Hence, $\E(Z_{t+u} \mid \mathcal{F}_t) = Z_t$, for any $u \geq 0$. This shows that $Z_t$ is a martingale for $t \leq T$. \hfill $\blacksquare$
+
+\end{enumerate}
+
+
+
+
+
+
+
+\end{solution*}
+
+
+
+
+
+
+\end{document}
